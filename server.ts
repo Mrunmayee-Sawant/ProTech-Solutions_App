@@ -8,7 +8,7 @@ import { createRequire } from "module";
 
 dotenv.config();
 
-const require = createRequire(import.meta.url);
+const require = createRequire(__filename);
 
 const customerRoutes = require("./backend/routes/customerRoutes.js");
 const staffRoutes = require("./backend/routes/staffRoutes.js");
@@ -52,7 +52,7 @@ async function startServer() {
     });
   });
 
-  // Redirect root to Login.html as per Registration -> Login -> Dashboard requirement
+  // Redirect root to Login.html
   app.get("/", (req, res) => {
     res.redirect("/Login.html");
   });
