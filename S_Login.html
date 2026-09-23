@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProTech Solutions - Staff &amp; Admin Login</title>
+    <link rel="stylesheet" href="C-CSS.css">
+    <link rel="icon" type="image/svg+xml" href="images/protech-logo.svg">
+</head>
+
+<body>
+
+    <div class="login-container">
+
+        <a href="S_Login.html" style="text-decoration: none;">
+            <img src="images/protech-logo.svg" alt="ProTech Solutions Logo" class="login-logo">
+        </a>
+
+        <h1>Staff &amp; Admin Login</h1>
+        <p class="subtitle">Secure administrative portal access</p>
+
+        <form id="staffLoginForm">
+
+            <div class="form-group">
+                <label for="staffUsername">Username or Staff Email</label>
+                <input
+                    type="text"
+                    id="staffUsername"
+                    placeholder="Enter registered username or email"
+                    required
+                    autocomplete="username"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="staffPassword">Password</label>
+                <input
+                    type="password"
+                    id="staffPassword"
+                    placeholder="Enter your staff password"
+                    required
+                    autocomplete="current-password"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="staffRole">Role</label>
+                <select id="staffRole" required>
+                    <option value="">Select Role</option>
+                    <option value="Admin">Administrator</option>
+                    <option value="Staff">Service Staff / Technician</option>
+                </select>
+            </div>
+
+            <button type="submit" class="submit-btn">Login to Staff Panel</button>
+
+        </form>
+
+        <p class="register">
+            New Staff Member?
+            <a href="S_Registration.html">Register Staff Account</a>
+        </p>
+
+        <p class="back-login" style="margin-top: 10px; padding-top: 12px; border-top: 1px dashed #CBD5E1;">
+            Customer?
+            <a href="Login.html">Go to Customer Login</a>
+        </p>
+
+    </div>
+
+    <script src="C-JS.js"></script>
+
+</body>
+
+</html>

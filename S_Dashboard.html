@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+```
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>
+    ProTech Solutions - Staff &amp; Admin Dashboard
+</title>
+
+<link
+    rel="stylesheet"
+    href="C-CSS.css"
+>
+
+<link
+    rel="icon"
+    type="image/svg+xml"
+    href="images/protech-logo.svg"
+>
+```
+
+</head>
+
+<body>
+
+```
+<!-- =====================================================
+     HEADER
+====================================================== -->
+<header class="dashboard-header">
+
+
+    <!-- BRAND -->
+    <div class="brand-wrapper">
+
+        <img
+            src="images/protech-logo.svg"
+            alt="ProTech Solutions"
+            class="brand-logo-img"
+        >
+
+        <div class="company-info">
+
+            <h2>
+                ProTech Solutions
+            </h2>
+
+            <p>
+                Admin &amp; Staff Control Panel
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- STAFF HEADER RIGHT -->
+    <div class="staff-header-right">
+
+        <span id="staffRoleDisplay">
+            Staff
+        </span>
+
+
+        <!-- =================================================
+             STAFF LOGOUT
+
+             This does NOT call staffLogout() from C-JS.js.
+             It directly clears the session.
+        ================================================== -->
+        <button
+            type="button"
+            class="logout-btn"
+            onclick="
+                localStorage.removeItem('loggedInStaff');
+                localStorage.removeItem('staffRole');
+                localStorage.removeItem('staffUsername');
+                localStorage.removeItem('staffEmail');
+                localStorage.removeItem('staffId');
+                localStorage.removeItem('adminSession');
+                localStorage.removeItem('staffSession');
+                localStorage.removeItem('loggedInCustomer');
+                sessionStorage.clear();
+                window.location.replace('S_Login.html');
+            "
+        >
+            Logout
+        </button>
+
+    </div>
+
+</header>
+
+
+<!-- =====================================================
+     WELCOME
+====================================================== -->
+<section class="welcome">
+
+    <h1 id="staffWelcome">
+        Welcome, Staff!
+    </h1>
+
+    <p>
+        Manage customers, CCTV products catalog,
+        service requests, invoices, and payments.
+    </p>
+
+</section>
+
+
+<!-- =====================================================
+     DASHBOARD CONTAINER
+====================================================== -->
+<div class="dashboard-container">
+
+
+    <!-- =================================================
+         CUSTOMER MANAGEMENT
+    ================================================== -->
+    <div class="dashboard-card">
+
+        <div class="card-icon">
+            👥
+        </div>
+
+        <h3>
+            Customer Management
+        </h3>
+
+        <p>
+            View registered customers, their installed
+            CCTV records, and submitted service requests.
+        </p>
+
+        <a
+            href="S_Managnment.html"
+            class="dashboard-link"
+        >
+            <button type="button">
+                Manage Customers
+            </button>
+        </a>
+
+    </div>
+
+
+    <!-- =================================================
+         CCTV PRODUCTS
+    ================================================== -->
+    <div class="dashboard-card">
+
+        <div class="card-icon">
+            📹
+        </div>
+
+        <h3>
+            CCTV Products Catalog
+        </h3>
+
+        <p>
+            Add new security cameras, update prices,
+            adjust inventory stock, and manage product listings.
+        </p>
+
+        <a
+            href="S_Manage-CCTV.html"
+            class="dashboard-link"
+        >
+            <button type="button">
+                Manage Products
+            </button>
+        </a>
+
+    </div>
+
+
+    <!-- =================================================
+         SERVICE REQUESTS
+    ================================================== -->
+    <div class="dashboard-card">
+
+        <div class="card-icon">
+            🔧
+        </div>
+
+        <h3>
+            Service Requests
+        </h3>
+
+        <p>
+            View incoming maintenance requests,
+            update dispatch status
+            (Pending, Confirmed, In Progress, Completed).
+        </p>
+
+        <a
+            href="S_Manage-Request.html"
+            class="dashboard-link"
+        >
+            <button type="button">
+                Manage Requests
+            </button>
+        </a>
+
+    </div>
+
+
+    <!-- =================================================
+         GENERATE BILLS
+    ================================================== -->
+    <div class="dashboard-card">
+
+        <div class="card-icon">
+            🧾
+        </div>
+
+        <h3>
+            Generate Bills
+        </h3>
+
+        <p>
+            Create customer invoices, calculate GST
+            breakdown, and issue official service bills.
+        </p>
+
+        <a
+            href="S_Generate-Bill.html"
+            class="dashboard-link"
+        >
+            <button type="button">
+                Generate Bill
+            </button>
+        </a>
+
+    </div>
+
+
+    <!-- =================================================
+         PAYMENTS
+    ================================================== -->
+    <div class="dashboard-card">
+
+        <div class="card-icon">
+            💳
+        </div>
+
+        <h3>
+            Confirm Payments
+        </h3>
+
+        <p>
+            Record and verify customer payments,
+            track transaction IDs, and update invoice status.
+        </p>
+
+        <a
+            href="S_Confirm-Payment.html"
+            class="dashboard-link"
+        >
+            <button type="button">
+                Confirm Payments
+            </button>
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     MAIN JAVASCRIPT
+====================================================== -->
+<script src="C-JS.js"></script>
+```
+
+</body>
+
+</html>

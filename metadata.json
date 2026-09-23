@@ -1,0 +1,6 @@
+{
+  "name": "ProTech Solutions",
+  "description": "Professional CCTV Products & Services management web application with surveillance sales, installations, service requests, billing, and customer portals.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

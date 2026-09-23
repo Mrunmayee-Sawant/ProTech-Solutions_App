@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProTech Solutions - Customer Registration</title>
+    <link rel="stylesheet" href="C-CSS.css">
+    <link rel="icon" type="image/svg+xml" href="images/protech-logo.svg">
+</head>
+
+<body>
+
+    <div class="register-container">
+
+        <!-- ProTech Solutions Brand Logo -->
+        <a href="Login.html" style="text-decoration: none;">
+            <img src="images/protech-logo.svg" alt="ProTech Solutions Logo" class="login-logo">
+        </a>
+
+        <h1>Customer Registration</h1>
+        <p class="subtitle">Create your personal account for CCTV service &amp; product sales</p>
+
+        <form id="registerForm">
+
+            <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input
+                    type="text"
+                    id="fullName"
+                    placeholder="Enter your full name"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="registerEmail">Email Address</label>
+                <input
+                    type="email"
+                    id="registerEmail"
+                    placeholder="name@example.com"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="mobile">Mobile Number (10 Digits)</label>
+                <input
+                    type="tel"
+                    id="mobile"
+                    placeholder="e.g. 9876543210"
+                    pattern="[0-9]{10}"
+                    maxlength="10"
+                    title="Mobile number must be exactly 10 digits"
+                    required
+                >
+                <small style="color: #64748B; font-size: 12px; margin-top: 2px;">Must be exactly 10 digits without country code.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="address">Installation / Home Address</label>
+                <textarea
+                    id="address"
+                    placeholder="Enter complete building, street, and area address"
+                    rows="3"
+                    required
+                ></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="registerPassword">Password</label>
+                <input
+                    type="password"
+                    id="registerPassword"
+                    placeholder="Create a secure password (min. 6 characters)"
+                    minlength="6"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input
+                    type="password"
+                    id="confirmPassword"
+                    placeholder="Re-enter your password"
+                    minlength="6"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="submit-btn">Create Account</button>
+
+        </form>
+
+        <p class="register">
+            Already have an account?
+            <a href="Login.html">Login here</a>
+        </p>
+
+        <p class="register" style="margin-top: 10px; padding-top: 12px; border-top: 1px dashed #CBD5E1;">
+            Staff Member? <a href="S_Registration.html">Staff Registration</a>
+        </p>
+
+    </div>
+
+    <script src="C-JS.js"></script>
+
+</body>
+</html>

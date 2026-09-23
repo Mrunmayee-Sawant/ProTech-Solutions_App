@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProTech Solutions - Order History</title>
+    <link rel="stylesheet" href="C-CSS.css">
+    <link rel="icon" type="image/svg+xml" href="images/protech-logo.svg">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="dashboard-header">
+
+        <div class="brand-wrapper">
+            <img src="images/protech-logo.svg" alt="ProTech Solutions" class="brand-logo-img">
+            <div class="company-info">
+                <h2>ProTech Solutions</h2>
+                <p>CCTV Service &amp; Sales</p>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <a href="CCTV-Product.html" class="nav-link">
+                <button type="button" class="logout-btn">
+                    Products
+                </button>
+            </a>
+
+            <a href="Dashboard.html" class="nav-link">
+                <button type="button" class="logout-btn">
+                    Dashboard
+                </button>
+            </a>
+        </div>
+
+    </header>
+
+    <section class="welcome">
+        <h1>My CCTV Product Orders</h1>
+        <p>Track your purchased security hardware, dispatch updates, and delivery status.</p>
+    </section>
+
+    <div class="history-container" id="orderHistoryContainer">
+        <p class="no-details">Loading your orders...</p>
+    </div>
+
+    <script src="C-JS.js"></script>
+
+    <script>
+        async function loadProductOrders() {
+            const container = document.getElementById("orderHistoryContainer");
+            const customer = getLoggedInCustomer();
+
+            if (!customer || !customer._id) {
+                container.innerHTML = `
+                    <div class="details-card" style="text-align: center;">
+                        <p class="no-details">Please log in to view your orders.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/orders/customer/${customer._id}`);
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || "Failed to load orders.");
+                }
+
+                const orders = result.orders || [];
+
+                if (orders.length === 0) {
+                    container.innerHTML = `
+                        <div class="details-card" style="text-align: center; padding: 48px 24px;">
+                            <div style="font-size: 48px; margin-bottom: 12px;">📦</div>
+                            <h3 style="color: #2D5A5C; margin-bottom: 8px;">No Product Orders Yet</h3>
+                            <p style="color: #64748B; margin-bottom: 20px;">You haven't purchased any CCTV security equipment yet.</p>
+                            <a href="CCTV-Product.html" style="text-decoration: none;">
+                                <button type="button" class="submit-btn" style="max-width: 240px; margin: 0 auto;">
+                                    Browse CCTV Products
+                                </button>
+                            </a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = `
+                    <h2>Purchased Orders (${orders.length})</h2>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Order #</th>
+                                    <th>Items Ordered</th>
+                                    <th>Total Amount</th>
+                                    <th>Delivery Address</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${orders.map(order => {
+                                    const date = formatDate(order.createdAt);
+                                    const itemsText = (order.items || []).map(i => `${i.name} (x${i.quantity})`).join(", ");
+                                    const statusClass = (order.status || "").toLowerCase() === "delivered" ? "completed-status" : "progress-status";
+
+                                    return `
+                                        <tr>
+                                            <td>${date}</td>
+                                            <td><strong>#${escapeHTML(order.orderNumber || order._id.substring(0, 8))}</strong></td>
+                                            <td>${escapeHTML(itemsText || "CCTV Hardware")}</td>
+                                            <td style="font-weight: 800; color: #2D5A5C;">₹${Number(order.totalAmount || 0).toLocaleString("en-IN")}</td>
+                                            <td style="font-size: 13px; max-width: 240px;">${escapeHTML(order.shippingAddress || "-")}</td>
+                                            <td><span class="${statusClass}">● ${escapeHTML(order.status || "Processing")}</span></td>
+                                        </tr>
+                                    `;
+                                }).join("")}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } catch (err) {
+                console.error("Order history error:", err);
+                container.innerHTML = `
+                    <div class="details-card" style="text-align: center;">
+                        <p class="no-details" style="color: #DC2626;">Error loading orders. Please verify database connection.</p>
+                    </div>
+                `;
+            }
+        }
+
+        loadProductOrders();
+    </script>
+
+</body>
+
+</html>

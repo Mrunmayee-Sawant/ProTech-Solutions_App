@@ -1,0 +1,1851 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ProTech Solutions - Generate Bills &amp; Invoices</title>
+
+    <link rel="stylesheet" href="C-CSS.css">
+    <link rel="icon" type="image/svg+xml" href="images/protech-logo.svg">
+</head>
+
+<body>
+
+    <header class="dashboard-header">
+
+        <div class="brand-wrapper">
+
+            <img
+                src="images/protech-logo.svg"
+                alt="ProTech Solutions"
+                class="brand-logo-img"
+            >
+
+            <div class="company-info">
+
+                <h2>
+                    ProTech Solutions
+                </h2>
+
+                <p>
+                    Staff &amp; Admin Panel
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="staff-header-right">
+
+            <span id="staffRoleDisplay">
+                Staff
+            </span>
+
+            <a
+                href="S_Dashboard.html"
+                class="nav-link"
+            >
+                <button
+                    type="button"
+                    class="dashboard-btn"
+                >
+                    Staff Dashboard
+                </button>
+            </a>
+
+            <button
+                type="button"
+                class="logout-btn"
+                onclick="staffLogout()"
+            >
+                Logout
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <section class="welcome">
+
+        <h1>
+            Invoice &amp; Bill Generation
+        </h1>
+
+        <p>
+            Issue formal tax invoices for CCTV installations,
+            hardware components, and service labor.
+        </p>
+
+    </section>
+
+
+    <div class="bill-form">
+
+        <h2>
+            Create Customer Invoice
+        </h2>
+
+
+        <form id="generateBillForm" novalidate>
+
+
+            <!-- CUSTOMER -->
+
+            <div class="form-group">
+
+                <label for="billCustomerSelect">
+                    Select Customer
+                </label>
+
+                <select
+                    id="billCustomerSelect"
+                    onchange="loadCustomerOrders()"
+                >
+
+                    <option value="">
+                        Loading customers...
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- BILL TYPE -->
+
+            <div class="form-group">
+
+                <label for="billType">
+                    Bill Type
+                </label>
+
+                <select
+                    id="billType"
+                    onchange="changeBillType()"
+                >
+
+                    <option value="">
+                        -- Select Bill Type --
+                    </option>
+
+                    <option value="Product">
+                        Product
+                    </option>
+
+                    <option value="Service">
+                        Service
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- PRODUCT ORDER -->
+
+            <div
+                class="form-group"
+                id="orderGroup"
+                style="display:none;"
+            >
+
+                <label for="billOrderSelect">
+                    Select Product Order
+                </label>
+
+                <select id="billOrderSelect">
+
+                    <option value="">
+                        -- Select Product Order --
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- SERVICE -->
+
+            <div
+                id="serviceFields"
+                style="display:none;"
+            >
+
+                <div class="form-group">
+
+                    <label for="billServiceType">
+                        Service Type
+                    </label>
+
+                    <input
+                        type="text"
+                        id="billServiceType"
+                        placeholder="Example: CCTV Installation"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="billRequestId">
+                        Service Request ID
+                    </label>
+
+                    <input
+                        type="text"
+                        id="billRequestId"
+                        placeholder="Example: SR123456789"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- ITEMS -->
+
+            <div
+                style="
+                    background:#F8FAFC;
+                    padding:18px;
+                    border-radius:12px;
+                    border:1px solid #E2E8F0;
+                "
+            >
+
+                <div
+                    style="
+                        display:flex;
+                        justify-content:space-between;
+                        align-items:center;
+                        margin-bottom:12px;
+                    "
+                >
+
+                    <label
+                        style="
+                            font-size:15px;
+                            font-weight:800;
+                            color:#2D5A5C;
+                        "
+                    >
+                        Billed Items / Services
+                    </label>
+
+                    <button
+                        type="button"
+                        class="dashboard-btn"
+                        onclick="addBillLineItem()"
+                        style="
+                            height:34px;
+                            padding:0 12px;
+                            font-size:12px;
+                        "
+                    >
+                        + Add Line Item
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="billItemsList"
+                    style="
+                        display:flex;
+                        flex-direction:column;
+                        gap:10px;
+                    "
+                >
+
+                    <div
+                        class="bill-item-row"
+                        style="
+                            display:flex;
+                            gap:10px;
+                            align-items:center;
+                        "
+                    >
+
+                        <input
+                            type="text"
+                            class="item-desc"
+                            placeholder="Item / Service description"
+                            style="flex:3;"
+                        >
+
+                        <input
+                            type="number"
+                            class="item-amount"
+                            placeholder="Amount (₹)"
+                            min="0"
+                            style="flex:1;"
+                            oninput="calculateBillTotals()"
+                        >
+
+                        <button
+                            type="button"
+                            class="remove-cart-btn"
+                            onclick="removeBillLineItem(this)"
+                            style="
+                                height:44px;
+                                padding:0 12px;
+                            "
+                        >
+                            ✕
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- TOTAL -->
+
+            <div
+                style="
+                    background:#FFFFFF;
+                    border:1.5px solid #CBD5E1;
+                    padding:16px;
+                    border-radius:10px;
+                    margin-top:10px;
+                "
+            >
+
+                <p style="margin:4px 0;">
+
+                    <strong>
+                        Subtotal:
+                    </strong>
+
+                    ₹<span id="calcSubtotal">
+                        0
+                    </span>
+
+                </p>
+
+
+                <p style="margin:4px 0;">
+
+                    <strong>
+                        GST (18%):
+                    </strong>
+
+                    ₹<span id="calcGst">
+                        0
+                    </span>
+
+                </p>
+
+
+                <p
+                    style="
+                        font-size:18px;
+                        font-weight:800;
+                        color:#2D5A5C;
+                        margin-top:8px;
+                    "
+                >
+
+                    <strong>
+                        Grand Total:
+                    </strong>
+
+                    ₹<span id="calcGrandTotal">
+                        0
+                    </span>
+
+                </p>
+
+            </div>
+
+
+            <!-- DATE -->
+
+            <div
+                class="form-group"
+                style="margin-top:10px;"
+            >
+
+                <label for="billDueDate">
+                    Invoice Due Date
+                </label>
+
+                <input
+                    type="date"
+                    id="billDueDate"
+                >
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="generate-bill-btn"
+                id="generateBillSubmitBtn"
+            >
+                Generate &amp; Issue Invoice
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- ISSUED BILLS -->
+
+    <div class="bill-list">
+
+        <h2>
+            Issued Invoices
+            (<span id="allBillsCount">0</span>)
+        </h2>
+
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Date</th>
+
+                        <th>Invoice #</th>
+
+                        <th>Customer</th>
+
+                        <th>Type</th>
+
+                        <th>Subtotal</th>
+
+                        <th>GST (18%)</th>
+
+                        <th>Total</th>
+
+                        <th>Status</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="allBillsTableBody">
+
+                    <tr>
+
+                        <td
+                            colspan="8"
+                            style="text-align:center;"
+                        >
+                            Loading invoices...
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <script src="C-JS.js"></script>
+
+
+    <script>
+
+        let customersList = [];
+
+        let customerOrders = [];
+
+
+        /* =========================
+           INITIALIZE
+        ========================= */
+
+        async function initBillPage() {
+
+            const due = new Date();
+
+            due.setDate(
+                due.getDate() + 7
+            );
+
+            document.getElementById(
+                "billDueDate"
+            ).value =
+                due.toISOString().split("T")[0];
+
+
+            await loadCustomersDropdown();
+
+            await loadAllBills();
+
+        }
+
+
+        /* =========================
+           CUSTOMERS
+        ========================= */
+
+        async function loadCustomersDropdown() {
+
+            const select =
+                document.getElementById(
+                    "billCustomerSelect"
+                );
+
+            try {
+
+                const response =
+                    await fetch(
+                        `${API_BASE_URL}/customers`
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                customersList =
+                    result.customers || [];
+
+
+                select.innerHTML = `
+                    <option value="">
+                        -- Choose Customer --
+                    </option>
+                `;
+
+
+                customersList.forEach(
+                    customer => {
+
+                        const option =
+                            document.createElement(
+                                "option"
+                            );
+
+                        option.value =
+                            customer._id;
+
+                        option.textContent =
+                            `${customer.name} (${customer.phone || ""})`;
+
+                        select.appendChild(
+                            option
+                        );
+
+                    }
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Customer loading error:",
+                    error
+                );
+
+
+                select.innerHTML = `
+                    <option value="">
+                        Error loading customers
+                    </option>
+                `;
+
+            }
+
+        }
+
+
+        /* =========================
+           BILL TYPE
+        ========================= */
+
+        function changeBillType() {
+
+            const type =
+                document.getElementById(
+                    "billType"
+                ).value;
+
+
+            const orderGroup =
+                document.getElementById(
+                    "orderGroup"
+                );
+
+
+            const serviceFields =
+                document.getElementById(
+                    "serviceFields"
+                );
+
+
+            if (type === "Product") {
+
+                orderGroup.style.display =
+                    "block";
+
+                serviceFields.style.display =
+                    "none";
+
+
+                clearBillItems();
+
+                loadCustomerOrders();
+
+
+            } else if (type === "Service") {
+
+                orderGroup.style.display =
+                    "none";
+
+                serviceFields.style.display =
+                    "block";
+
+
+                clearBillItems();
+
+            } else {
+
+                orderGroup.style.display =
+                    "none";
+
+                serviceFields.style.display =
+                    "none";
+
+                clearBillItems();
+
+            }
+
+        }
+
+
+        /* =========================
+           CUSTOMER ORDERS
+        ========================= */
+
+        async function loadCustomerOrders() {
+
+            const customerId =
+                document.getElementById(
+                    "billCustomerSelect"
+                ).value;
+
+
+            const orderSelect =
+                document.getElementById(
+                    "billOrderSelect"
+                );
+
+
+            if (!customerId) {
+
+                orderSelect.innerHTML = `
+                    <option value="">
+                        -- Select Customer First --
+                    </option>
+                `;
+
+                return;
+
+            }
+
+
+            orderSelect.innerHTML = `
+                <option value="">
+                    Loading orders...
+                </option>
+            `;
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        `${API_BASE_URL}/orders/customer/${customerId}`
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                console.log(
+                    "Customer orders:",
+                    result
+                );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        result.message ||
+                        "Unable to load orders."
+                    );
+
+                }
+
+
+                customerOrders =
+                    result.orders || [];
+
+
+                if (
+                    customerOrders.length === 0
+                ) {
+
+                    orderSelect.innerHTML = `
+                        <option value="">
+                            No product orders found
+                        </option>
+                    `;
+
+                    return;
+
+                }
+
+
+                orderSelect.innerHTML = `
+                    <option value="">
+                        -- Select Product Order --
+                    </option>
+                `;
+
+
+                customerOrders.forEach(
+                    order => {
+
+                        const option =
+                            document.createElement(
+                                "option"
+                            );
+
+
+                        option.value =
+                            order._id;
+
+
+                        const productName =
+                            order.product &&
+                            order.product.name
+                                ? order.product.name
+                                : "Product";
+
+
+                        const quantity =
+                            order.quantity || 1;
+
+
+                        const amount =
+                            Number(
+                                order.totalAmount || 0
+                            );
+
+
+                        const paymentMethod =
+                            order.paymentMethod ||
+                            "Cash";
+
+
+                        option.textContent =
+                            `${productName} × ${quantity} - ₹${amount.toLocaleString("en-IN")} (${paymentMethod})`;
+
+
+                        orderSelect.appendChild(
+                            option
+                        );
+
+                    }
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Order loading error:",
+                    error
+                );
+
+
+                orderSelect.innerHTML = `
+                    <option value="">
+                        Error loading orders
+                    </option>
+                `;
+
+            }
+
+        }
+
+
+        /* =========================
+           PRODUCT ORDER SELECT
+        ========================= */
+
+        document.getElementById(
+            "billOrderSelect"
+        ).addEventListener(
+            "change",
+            function() {
+
+                const order =
+                    customerOrders.find(
+                        o =>
+                            o._id ===
+                            this.value
+                    );
+
+
+                if (!order) {
+
+                    return;
+
+                }
+
+
+                const productName =
+                    order.product &&
+                    order.product.name
+                        ? order.product.name
+                        : "Product";
+
+
+                const quantity =
+                    order.quantity || 1;
+
+
+                const total =
+                    Number(
+                        order.totalAmount || 0
+                    );
+
+
+                const paymentMethod =
+                    order.paymentMethod ||
+                    "Cash";
+
+
+                document.getElementById(
+                    "billItemsList"
+                ).innerHTML = `
+
+                    <div
+                        class="bill-item-row"
+                        style="
+                            display:flex;
+                            gap:10px;
+                            align-items:center;
+                        "
+                    >
+
+                        <input
+                            type="text"
+                            class="item-desc"
+                            value="${escapeHTML(
+                                productName
+                            )} x ${quantity}"
+                            readonly
+                            style="flex:3;"
+                        >
+
+                        <input
+                            type="number"
+                            class="item-amount"
+                            value="${total}"
+                            readonly
+                            style="flex:1;"
+                        >
+
+                    </div>
+
+                `;
+
+
+                calculateBillTotals();
+
+            }
+        );
+
+
+        /* =========================
+           ADD SERVICE ITEM
+        ========================= */
+
+        function addBillLineItem() {
+
+            const billType =
+                document.getElementById(
+                    "billType"
+                ).value;
+
+
+            if (billType === "Product") {
+
+                alert(
+                    "Select a product order instead."
+                );
+
+                return;
+
+            }
+
+
+            const container =
+                document.getElementById(
+                    "billItemsList"
+                );
+
+
+            const div =
+                document.createElement(
+                    "div"
+                );
+
+
+            div.className =
+                "bill-item-row";
+
+
+            div.style.cssText =
+                "display:flex; gap:10px; align-items:center;";
+
+
+            div.innerHTML = `
+
+                <input
+                    type="text"
+                    class="item-desc"
+                    placeholder="Service description"
+                    style="flex:3;"
+                >
+
+                <input
+                    type="number"
+                    class="item-amount"
+                    placeholder="Amount (₹)"
+                    min="0"
+                    style="flex:1;"
+                    oninput="calculateBillTotals()"
+                >
+
+                <button
+                    type="button"
+                    class="remove-cart-btn"
+                    onclick="removeBillLineItem(this)"
+                    style="
+                        height:44px;
+                        padding:0 12px;
+                    "
+                >
+                    ✕
+                </button>
+
+            `;
+
+
+            container.appendChild(
+                div
+            );
+
+        }
+
+
+        /* =========================
+           REMOVE ITEM
+        ========================= */
+
+        function removeBillLineItem(
+            button
+        ) {
+
+            const rows =
+                document.querySelectorAll(
+                    ".bill-item-row"
+                );
+
+
+            if (
+                rows.length <= 1
+            ) {
+
+                alert(
+                    "An invoice must contain at least one line item."
+                );
+
+                return;
+
+            }
+
+
+            button
+                .closest(".bill-item-row")
+                .remove();
+
+
+            calculateBillTotals();
+
+        }
+
+
+        /* =========================
+           CLEAR ITEMS
+        ========================= */
+
+        function clearBillItems() {
+
+            document.getElementById(
+                "billItemsList"
+            ).innerHTML = `
+
+                <div
+                    class="bill-item-row"
+                    style="
+                        display:flex;
+                        gap:10px;
+                        align-items:center;
+                    "
+                >
+
+                    <input
+                        type="text"
+                        class="item-desc"
+                        placeholder="Item / Service description"
+                        style="flex:3;"
+                    >
+
+                    <input
+                        type="number"
+                        class="item-amount"
+                        placeholder="Amount (₹)"
+                        min="0"
+                        style="flex:1;"
+                        oninput="calculateBillTotals()"
+                    >
+
+                    <button
+                        type="button"
+                        class="remove-cart-btn"
+                        onclick="removeBillLineItem(this)"
+                        style="
+                            height:44px;
+                            padding:0 12px;
+                        "
+                    >
+                        ✕
+                    </button>
+
+                </div>
+
+            `;
+
+
+            calculateBillTotals();
+
+        }
+
+
+        /* =========================
+           TOTALS
+        ========================= */
+
+        function calculateBillTotals() {
+
+            const amounts =
+                document.querySelectorAll(
+                    ".item-amount"
+                );
+
+
+            let subtotal = 0;
+
+
+            amounts.forEach(
+                input => {
+
+                    subtotal +=
+                        Number(
+                            input.value || 0
+                        );
+
+                }
+            );
+
+
+            const gst =
+                Math.round(
+                    subtotal * 0.18
+                );
+
+
+            const total =
+                subtotal + gst;
+
+
+            document.getElementById(
+                "calcSubtotal"
+            ).textContent =
+                subtotal.toLocaleString(
+                    "en-IN"
+                );
+
+
+            document.getElementById(
+                "calcGst"
+            ).textContent =
+                gst.toLocaleString(
+                    "en-IN"
+                );
+
+
+            document.getElementById(
+                "calcGrandTotal"
+            ).textContent =
+                total.toLocaleString(
+                    "en-IN"
+                );
+
+
+            return {
+                subtotal,
+                gst,
+                total
+            };
+
+        }
+
+
+        /* =========================
+           SUBMIT BILL
+        ========================= */
+
+        document
+            .getElementById(
+                "generateBillForm"
+            )
+            .addEventListener(
+                "submit",
+                async function(event) {
+
+                    event.preventDefault();
+
+
+                    let submitBtn =
+                        document.getElementById(
+                            "generateBillSubmitBtn"
+                        );
+
+
+                    try {
+
+                        const customerId =
+                            document.getElementById(
+                                "billCustomerSelect"
+                            ).value;
+
+
+                        const billType =
+                            document.getElementById(
+                                "billType"
+                            ).value;
+
+
+                        if (!customerId) {
+
+                            alert(
+                                "Please select a customer."
+                            );
+
+                            return;
+
+                        }
+
+
+                        if (!billType) {
+
+                            alert(
+                                "Please select Product or Service."
+                            );
+
+                            return;
+
+                        }
+
+
+                        /* CHECK LINE ITEMS */
+
+                        const descriptions =
+                            document.querySelectorAll(
+                                ".item-desc"
+                            );
+
+
+                        const amounts =
+                            document.querySelectorAll(
+                                ".item-amount"
+                            );
+
+
+                        for (
+                            let i = 0;
+                            i < descriptions.length;
+                            i++
+                        ) {
+
+                            if (
+                                !descriptions[i].value.trim()
+                            ) {
+
+                                alert(
+                                    "Please enter the item/service description."
+                                );
+
+                                descriptions[i].focus();
+
+                                return;
+
+                            }
+
+
+                            if (
+                                Number(amounts[i].value || 0) <= 0
+                            ) {
+
+                                alert(
+                                    "Please enter a valid amount."
+                                );
+
+                                amounts[i].focus();
+
+                                return;
+
+                            }
+
+                        }
+
+
+                        const totals =
+                            calculateBillTotals();
+
+
+                        if (
+                            totals.subtotal <=
+                            0
+                        ) {
+
+                            alert(
+                                "Please enter a valid bill amount."
+                            );
+
+                            return;
+
+                        }
+
+
+                        submitBtn.disabled =
+                            true;
+
+
+                        submitBtn.textContent =
+                            "Creating Invoice...";
+
+
+                        /* =========================
+                           BASIC BILL DATA
+                        ========================= */
+
+                        const billData = {
+
+                            billId:
+                                "BILL" +
+                                Date.now(),
+
+                            customerId:
+                                customerId,
+
+                            billType:
+                                billType,
+
+                            gst:
+                                totals.gst,
+
+                            totalAmount:
+                                totals.total,
+
+                            billDate:
+                                new Date()
+                                    .toISOString(),
+
+                            paidAmount:
+                                0,
+
+                            balanceAmount:
+                                totals.total,
+
+                            status:
+                                "Pending"
+
+                        };
+
+
+                        /* =========================
+                           PRODUCT BILL
+                        ========================= */
+
+                        if (
+                            billType ===
+                            "Product"
+                        ) {
+
+                            const orderId =
+                                document.getElementById(
+                                    "billOrderSelect"
+                                ).value;
+
+
+                            if (!orderId) {
+
+                                alert(
+                                    "Please select a product order."
+                                );
+
+                                return;
+
+                            }
+
+
+                            const selectedOrder =
+                                customerOrders.find(
+                                    order =>
+                                        order._id ===
+                                        orderId
+                                );
+
+
+                            if (!selectedOrder) {
+
+                                alert(
+                                    "Selected product order was not found."
+                                );
+
+                                return;
+
+                            }
+
+
+                            const paymentMethod =
+                                selectedOrder.paymentMethod ||
+                                "Cash";
+
+
+                            billData.orderId =
+                                orderId;
+
+
+                            /*
+
+                               PRODUCT PAYMENT RULE:
+
+                               UPI / CARD / NETBANKING
+                               = ALREADY PAID
+
+                               CASH
+                               = CASH ON DELIVERY
+                               = PAYMENT PENDING
+
+                            */
+
+                            if (
+                                paymentMethod === "UPI" ||
+                                paymentMethod === "Card" ||
+                                paymentMethod === "NetBanking"
+                            ) {
+
+                                billData.status =
+                                    "Paid";
+
+                                billData.paidAmount =
+                                    totals.total;
+
+                                billData.balanceAmount =
+                                    0;
+
+                            } else {
+
+                                billData.status =
+                                    "Pending";
+
+                                billData.paidAmount =
+                                    0;
+
+                                billData.balanceAmount =
+                                    totals.total;
+
+                            }
+
+
+                            console.log(
+                                "PRODUCT BILL:",
+                                billData
+                            );
+
+                        }
+
+
+                        /* =========================
+                           SERVICE BILL
+                           CASH ALREADY PAID
+                        ========================= */
+
+                        if (
+                            billType ===
+                            "Service"
+                        ) {
+
+                            const serviceType =
+                                document.getElementById(
+                                    "billServiceType"
+                                ).value.trim();
+
+
+                            const requestId =
+                                document.getElementById(
+                                    "billRequestId"
+                                ).value.trim();
+
+
+                            if (!serviceType) {
+
+                                alert(
+                                    "Please enter Service Type."
+                                );
+
+                                return;
+
+                            }
+
+
+                            if (!requestId) {
+
+                                alert(
+                                    "Please enter Service Request ID."
+                                );
+
+                                return;
+
+                            }
+
+
+                            billData.serviceType =
+                                serviceType;
+
+
+                            billData.requestId =
+                                requestId;
+
+
+                            billData.serviceCharge =
+                                totals.subtotal;
+
+
+                            /*
+
+                               SERVICE IS ALREADY PAID
+                               IN CASH TO TECHNICIAN
+
+                            */
+
+                            billData.status =
+                                "Paid";
+
+
+                            billData.paidAmount =
+                                totals.total;
+
+
+                            billData.balanceAmount =
+                                0;
+
+
+                            console.log(
+                                "SERVICE BILL - PAID:",
+                                billData
+                            );
+
+                        }
+
+
+                        console.log(
+                            "SENDING BILL:",
+                            billData
+                        );
+
+
+                        /* =========================
+                           SEND TO BACKEND
+                        ========================= */
+
+                        const response =
+                            await fetch(
+                                `${API_BASE_URL}/bills`,
+                                {
+
+                                    method:
+                                        "POST",
+
+                                    headers: {
+
+                                        "Content-Type":
+                                            "application/json"
+
+                                    },
+
+                                    body:
+                                        JSON.stringify(
+                                            billData
+                                        )
+
+                                }
+                            );
+
+
+                        const result =
+                            await response.json();
+
+
+                        console.log(
+                            "SERVER RESPONSE:",
+                            result
+                        );
+
+
+                        if (
+                            !response.ok
+                        ) {
+
+                            throw new Error(
+                                result.message ||
+                                result.error ||
+                                "Bill generation failed."
+                            );
+
+                        }
+
+
+                        alert(
+                            billType === "Service"
+                                ? "Service invoice #" +
+                                  result.bill.billId +
+                                  " generated successfully and marked as PAID."
+                                : result.bill.status === "Paid"
+                                    ? "Product invoice #" +
+                                      result.bill.billId +
+                                      " generated successfully and marked as PAID."
+                                    : "Product invoice #" +
+                                      result.bill.billId +
+                                      " generated successfully and marked as PENDING."
+                        );
+
+
+                        document
+                            .getElementById(
+                                "generateBillForm"
+                            )
+                            .reset();
+
+
+                        document.getElementById(
+                            "orderGroup"
+                        ).style.display =
+                            "none";
+
+
+                        document.getElementById(
+                            "serviceFields"
+                        ).style.display =
+                            "none";
+
+
+                        clearBillItems();
+
+
+                        customerOrders =
+                            [];
+
+
+                        await loadAllBills();
+
+
+                    } catch (error) {
+
+                        console.error(
+                            "BILL ERROR:",
+                            error
+                        );
+
+
+                        alert(
+                            "Bill generation failed: " +
+                            error.message
+                        );
+
+                    } finally {
+
+                        submitBtn.disabled =
+                            false;
+
+                        submitBtn.textContent =
+                            "Generate & Issue Invoice";
+
+                    }
+
+                }
+            );
+
+
+        /* =========================
+           LOAD ALL BILLS
+        ========================= */
+
+        async function loadAllBills() {
+
+            const tbody =
+                document.getElementById(
+                    "allBillsTableBody"
+                );
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        `${API_BASE_URL}/bills`
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        result.message ||
+                        "Failed to load bills."
+                    );
+
+                }
+
+
+                const bills =
+                    result.bills || [];
+
+
+                document.getElementById(
+                    "allBillsCount"
+                ).textContent =
+                    bills.length;
+
+
+                if (
+                    bills.length === 0
+                ) {
+
+                    tbody.innerHTML = `
+                        <tr>
+
+                            <td
+                                colspan="8"
+                                style="
+                                    text-align:center;
+                                    padding:24px;
+                                    color:#64748B;
+                                "
+                            >
+                                No invoices created yet.
+                            </td>
+
+                        </tr>
+                    `;
+
+                    return;
+
+                }
+
+
+                tbody.innerHTML =
+                    bills.map(
+                        bill => {
+
+                            const customerName =
+                                bill.customerId &&
+                                bill.customerId.name
+                                    ? bill.customerId.name
+                                    : "Customer";
+
+
+                            const isPaid =
+                                (
+                                    bill.status ||
+                                    ""
+                                ).toLowerCase() ===
+                                "paid";
+
+
+                            const subtotal =
+                                Number(
+                                    bill.totalAmount ||
+                                    0
+                                ) -
+                                Number(
+                                    bill.gst ||
+                                    0
+                                );
+
+
+                            return `
+
+                                <tr>
+
+                                    <td>
+                                        ${formatDate(
+                                            bill.billDate
+                                        )}
+                                    </td>
+
+                                    <td>
+                                        <strong>
+                                            #${escapeHTML(
+                                                bill.billId ||
+                                                "N/A"
+                                            )}
+                                        </strong>
+                                    </td>
+
+                                    <td>
+                                        ${escapeHTML(
+                                            customerName
+                                        )}
+                                    </td>
+
+                                    <td>
+                                        ${escapeHTML(
+                                            bill.billType ||
+                                            "N/A"
+                                        )}
+                                    </td>
+
+                                    <td>
+                                        ₹${subtotal.toLocaleString(
+                                            "en-IN"
+                                        )}
+                                    </td>
+
+                                    <td>
+                                        ₹${Number(
+                                            bill.gst ||
+                                            0
+                                        ).toLocaleString(
+                                            "en-IN"
+                                        )}
+                                    </td>
+
+                                    <td
+                                        style="
+                                            font-weight:800;
+                                            color:#2D5A5C;
+                                        "
+                                    >
+                                        ₹${Number(
+                                            bill.totalAmount ||
+                                            0
+                                        ).toLocaleString(
+                                            "en-IN"
+                                        )}
+                                    </td>
+
+                                    <td>
+
+                                        <span
+                                            class="status ${
+                                                isPaid
+                                                    ? "bill-paid"
+                                                    : "bill-pending"
+                                            }"
+                                        >
+
+                                            ${
+                                                isPaid
+                                                    ? "Paid"
+                                                    : "Pending"
+                                            }
+
+                                        </span>
+
+                                    </td>
+
+                                </tr>
+
+                            `;
+
+                        }
+                    ).join("");
+
+
+            } catch (error) {
+
+                console.error(
+                    "Load bills error:",
+                    error
+                );
+
+
+                tbody.innerHTML = `
+
+                    <tr>
+
+                        <td
+                            colspan="8"
+                            style="
+                                text-align:center;
+                                color:#DC2626;
+                            "
+                        >
+
+                            Error:
+                            ${escapeHTML(
+                                error.message
+                            )}
+
+                        </td>
+
+                    </tr>
+
+                `;
+
+            }
+
+        }
+
+
+        /* START */
+
+        initBillPage();
+
+    </script>
+
+</body>
+
+</html>

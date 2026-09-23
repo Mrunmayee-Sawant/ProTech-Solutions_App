@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProTech Solutions - Manage CCTV Products</title>
+    <link rel="stylesheet" href="C-CSS.css">
+    <link rel="icon" type="image/svg+xml" href="images/protech-logo.svg">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="dashboard-header">
+
+        <div class="brand-wrapper">
+            <img src="images/protech-logo.svg" alt="ProTech Solutions" class="brand-logo-img">
+            <div class="company-info">
+                <h2>ProTech Solutions</h2>
+                <p>Staff &amp; Admin Panel</p>
+            </div>
+        </div>
+
+        <div class="staff-header-right">
+            <span id="staffRoleDisplay">Staff</span>
+            <a href="S_Dashboard.html" class="nav-link">
+                <button type="button" class="dashboard-btn">
+                    Staff Dashboard
+                </button>
+            </a>
+            <button type="button" class="logout-btn" onclick="staffLogout()">
+                Logout
+            </button>
+        </div>
+
+    </header>
+
+    <section class="welcome">
+        <h1>CCTV Products Catalog Management</h1>
+        <p>Add new security cameras, update retail pricing, and monitor warehouse inventory levels.</p>
+    </section>
+
+    <!-- Add Product Form -->
+    <div class="product-form">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #F1F5F9; padding-bottom: 12px; margin-bottom: 18px;">
+            <h2 id="productFormTitle" style="margin-bottom: 0; border-bottom: none; padding-bottom: 0;">Add New CCTV Product</h2>
+            <button type="button" class="dashboard-btn" style="height: 38px;" onclick="seedSampleProducts()">
+                📦 Seed Default Catalog
+            </button>
+        </div>
+
+        <form id="adminProductForm">
+            <input type="hidden" id="editProductId">
+
+            <div class="form-group">
+                <label for="prodName">Product Title &amp; Model</label>
+                <input
+                    type="text"
+                    id="prodName"
+                    placeholder="e.g. Godrej SeeThru 7 Pro Video Door Phone"
+                    required
+                >
+            </div>
+
+            <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+                <div class="form-group" style="flex: 1; min-width: 200px;">
+                    <label for="prodCategory">Category</label>
+                    <select id="prodCategory" required>
+                        <option value="Video Door Phone">Video Door Phone</option>
+                        <option value="Solar Camera">Solar &amp; 4G Wireless</option>
+                        <option value="Indoor Camera">Indoor Smart Camera</option>
+                        <option value="Outdoor Camera">Outdoor Bullet Camera</option>
+                        <option value="NVR / DVR">NVR / DVR Recorders</option>
+                        <option value="Switch & Networking">PoE Switches &amp; Accessories</option>
+                        <option value="Storage">Surveillance Storage Hard Drives</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="flex: 1; min-width: 200px;">
+                    <label for="prodPrice">Price (₹ INR)</label>
+                    <input
+                        type="number"
+                        id="prodPrice"
+                        placeholder="e.g. 14500"
+                        min="1"
+                        required
+                    >
+                </div>
+
+                <div class="form-group" style="flex: 1; min-width: 200px;">
+                    <label for="prodStock">Available Inventory Stock</label>
+                    <input
+                        type="number"
+                        id="prodStock"
+                        placeholder="e.g. 25"
+                        min="0"
+                        required
+                    >
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="prodImage">Image File Reference</label>
+                <select id="prodImage">
+                    <option value="images/seethru-7-pro.svg">Godrej SeeThru 7 Pro VDP (seethru-7-pro.svg)</option>
+                    <option value="images/seethru-7-contactless.svg">Godrej Contactless VDP (seethru-7-contactless.svg)</option>
+                    <option value="images/seethru-pro-nova.svg">Godrej Pro Nova VDP (seethru-pro-nova.svg)</option>
+                    <option value="images/ace-pro-green-solar.svg">Ace Pro Green Solar 4G (ace-pro-green-solar.svg)</option>
+                    <option value="images/ace-pro-4g-mini-pt.svg">Ace Pro 4G Mini PT (ace-pro-4g-mini-pt.svg)</option>
+                    <option value="images/ace-pro-4g-linkage.svg">Ace Pro 4G Dual-Lens (ace-pro-4g-linkage.svg)</option>
+                    <option value="images/ace-pro-home-camera.svg">Ace Pro 3MP Home Camera (ace-pro-home-camera.svg)</option>
+                    <option value="images/seethru-smart-nvr.svg">SeeThru Smart 32-CH NVR (seethru-smart-nvr.svg)</option>
+                    <option value="images/seethru-smart-dome.svg">SeeThru Smart Dome Camera (seethru-smart-dome.svg)</option>
+                    <option value="images/outdoor-camera.svg">Outdoor Bullet Camera (outdoor-camera.svg)</option>
+                    <option value="images/st-poe-4p2u.svg">SeeThru ST-POE-4P2U PoE Switch (st-poe-4p2u.svg)</option>
+                    <option value="images/hdd.svg">1TB Surveillance Hard Drive (hdd.svg)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="prodDesc">Product Features &amp; Description</label>
+                <textarea
+                    id="prodDesc"
+                    placeholder="Enter detailed technical specifications, resolution, warranty, etc."
+                    rows="3"
+                    required
+                ></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn" id="prodSubmitBtn">
+                Save Product to Database
+            </button>
+
+            <button type="button" id="cancelProdEditBtn" style="display: none;" onclick="resetProductForm()">
+                Cancel Edit
+            </button>
+        </form>
+    </div>
+
+    <!-- Product Table -->
+    <div class="product-list">
+        <h2>Existing Catalog Products (<span id="prodCount">0</span>)</h2>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Product Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="adminProductsTableBody">
+                    <tr>
+                        <td colspan="7" style="text-align: center;">Loading catalog products...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="C-JS.js"></script>
+
+    <script>
+        let catalog = [];
+
+        async function loadAdminProducts() {
+            const tbody = document.getElementById("adminProductsTableBody");
+            try {
+                const response = await fetch(`${API_BASE_URL}/products`);
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || "Failed to load products.");
+                }
+
+                catalog = result.products || [];
+                document.getElementById("prodCount").textContent = catalog.length;
+
+                if (catalog.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 24px; color:#64748B;">No products found in catalog. Click "Seed Default Catalog" to populate.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = catalog.map(p => {
+                    const img = resolveProductImage(p.image);
+                    const stock = Number(p.stock || 0);
+                    return `
+                        <tr>
+                            <td>
+                                <img
+                                    src="${escapeHTML(img)}"
+                                    alt="${escapeHTML(p.name)}"
+                                    style="width: 48px; height: 48px; object-fit: contain; border-radius: 6px; background: #F8FAFC; border: 1px solid #E2E8F0;"
+                                    onerror="this.onerror=null; this.src='images/seethru-smart-dome.svg';"
+                                >
+                            </td>
+                            <td><strong>${escapeHTML(p.name)}</strong></td>
+                            <td><span class="product-category-tag">${escapeHTML(p.category || "CCTV")}</span></td>
+                            <td style="font-weight: 700; color: #2D5A5C;">₹${Number(p.price || 0).toLocaleString("en-IN")}</td>
+                            <td>${stock > 0 ? `<span style="color:#059669; font-weight:700;">${stock} units</span>` : `<span style="color:#DC2626; font-weight:700;">Out of Stock</span>`}</td>
+                            <td><span class="${stock > 0 ? 'paid-status' : 'cancelled-status'}">${stock > 0 ? 'Active' : 'Out of Stock'}</span></td>
+                            <td>
+                                <button type="button" onclick="editProduct('${p._id}')">Edit</button>
+                                <button type="button" class="remove-cart-btn" style="background:#FEE2E2; color:#DC2626;" onclick="deleteProduct('${p._id}')">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join("");
+            } catch (err) {
+                console.error("Catalog error:", err);
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#DC2626;">Error: ${err.message}</td></tr>`;
+            }
+        }
+
+        document.getElementById("adminProductForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            const editId = document.getElementById("editProductId").value;
+            const name = document.getElementById("prodName").value.trim();
+            const category = document.getElementById("prodCategory").value;
+            const price = Number(document.getElementById("prodPrice").value || 0);
+            const stock = Number(document.getElementById("prodStock").value || 0);
+            const image = document.getElementById("prodImage").value;
+            const description = document.getElementById("prodDesc").value.trim();
+
+            const isEdit = Boolean(editId);
+            const url = isEdit ? `${API_BASE_URL}/products/${editId}` : `${API_BASE_URL}/products`;
+            const method = isEdit ? "PUT" : "POST";
+
+            try {
+                const res = await fetch(url, {
+                    method,
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name, category, price, stock, image, description })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || "Failed to save product.");
+
+                alert(isEdit ? "Product updated successfully!" : "Product added to catalog!");
+                resetProductForm();
+                loadAdminProducts();
+            } catch (err) {
+                console.error("Save product error:", err);
+                alert("Error: " + err.message);
+            }
+        });
+
+        function editProduct(id) {
+            const p = catalog.find(x => x._id === id);
+            if (!p) return;
+
+            document.getElementById("editProductId").value = p._id;
+            document.getElementById("prodName").value = p.name || "";
+            document.getElementById("prodCategory").value = p.category || "Video Door Phone";
+            document.getElementById("prodPrice").value = p.price || 0;
+            document.getElementById("prodStock").value = p.stock || 0;
+            document.getElementById("prodDesc").value = p.description || "";
+            
+            if (p.image) {
+                document.getElementById("prodImage").value = p.image;
+            }
+
+            document.getElementById("productFormTitle").textContent = "Edit CCTV Product";
+            document.getElementById("prodSubmitBtn").textContent = "Update Product in Catalog";
+            document.getElementById("cancelProdEditBtn").style.display = "block";
+            window.scrollTo({ top: 120, behavior: "smooth" });
+        }
+
+        function resetProductForm() {
+            document.getElementById("adminProductForm").reset();
+            document.getElementById("editProductId").value = "";
+            document.getElementById("productFormTitle").textContent = "Add New CCTV Product";
+            document.getElementById("prodSubmitBtn").textContent = "Save Product to Database";
+            document.getElementById("cancelProdEditBtn").style.display = "none";
+        }
+
+        async function deleteProduct(id) {
+            if (!confirm("Are you sure you want to delete this product?")) return;
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/products/${id}`, { method: "DELETE" });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || "Delete failed");
+                alert("Product removed from catalog.");
+                loadAdminProducts();
+            } catch (e) {
+                alert("Delete error: " + e.message);
+            }
+        }
+
+        async function seedSampleProducts() {
+            if (!confirm("This will seed standard Godrej and ProTech security products into MongoDB. Proceed?")) return;
+            try {
+                const res = await fetch(`${API_BASE_URL}/products/seed`, { method: "POST" });
+                const data = await res.json();
+                alert(data.message || "Catalog populated!");
+                loadAdminProducts();
+            } catch (e) {
+                alert("Seed error: " + e.message);
+            }
+        }
+
+        loadAdminProducts();
+    </script>
+
+</body>
+
+</html>

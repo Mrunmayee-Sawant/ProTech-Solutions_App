@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProTech Solutions - Order Checkout</title>
+    <link rel="stylesheet" href="C-CSS.css">
+    <link rel="icon" type="image/svg+xml" href="images/protech-logo.svg">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="dashboard-header">
+
+        <div class="brand-wrapper">
+            <img src="images/protech-logo.svg" alt="ProTech Solutions" class="brand-logo-img">
+            <div class="company-info">
+                <h2>ProTech Solutions</h2>
+                <p>CCTV Service &amp; Sales</p>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <a href="Cart.html" class="cart-link" title="My Cart">
+                🛒
+                <span id="cartCount" class="cart-count">0</span>
+            </a>
+
+            <a href="Dashboard.html" class="nav-link">
+                <button type="button" class="logout-btn">
+                    Dashboard
+                </button>
+            </a>
+        </div>
+
+    </header>
+
+    <section class="welcome">
+        <h1>Confirm Your CCTV Order</h1>
+        <p>Review items, confirm delivery address, and proceed to payment.</p>
+    </section>
+
+    <div class="order-container">
+
+        <!-- Order Items Breakdown -->
+        <div id="orderItemsSummary">
+            <!-- Dynamic Items -->
+        </div>
+
+        <!-- Customer & Delivery Information -->
+        <div class="order-form" style="margin-top: 24px;">
+            <h2>Delivery &amp; Contact Details</h2>
+
+            <form id="placeOrderForm">
+
+                <div class="form-group">
+                    <label for="orderCustomerName">Full Name</label>
+                    <input
+                        type="text"
+                        id="orderCustomerName"
+                        placeholder="Enter recipient full name"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="orderCustomerPhone">Contact Phone Number (10 Digits)</label>
+                    <input
+                        type="tel"
+                        id="orderCustomerPhone"
+                        placeholder="e.g. 9876543210"
+                        pattern="[0-9]{10}"
+                        maxlength="10"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="orderCustomerAddress">Installation &amp; Delivery Address</label>
+                    <textarea
+                        id="orderCustomerAddress"
+                        placeholder="Enter full shipping/installation address"
+                        rows="3"
+                        required
+                    ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="orderNotes">Order / Installation Notes (Optional)</label>
+                    <input
+                        type="text"
+                        id="orderNotes"
+                        placeholder="e.g. Call before delivery, 2nd floor office"
+                    >
+                </div>
+
+                <button type="submit" class="place-order-btn" id="submitOrderBtn">
+                    Place Order &amp; Proceed to Payment
+                </button>
+
+            </form>
+        </div>
+
+    </div>
+
+    <script src="C-JS.js"></script>
+
+    <script>
+        let checkoutItems = [];
+        let grandTotal = 0;
+
+        function initializeOrderPage() {
+            const customer = getLoggedInCustomer();
+            if (customer) {
+                document.getElementById("orderCustomerName").value = customer.name || "";
+                document.getElementById("orderCustomerPhone").value = customer.phone || "";
+                document.getElementById("orderCustomerAddress").value = customer.address || "";
+            }
+
+            const isCartCheckout = localStorage.getItem("checkoutCart") === "true";
+            const singleProductStr = localStorage.getItem("selectedProduct");
+
+            if (isCartCheckout) {
+                const cart = getCart();
+                if (cart.length === 0) {
+                    alert("Your cart is empty. Please select products first.");
+                    window.location.href = "CCTV-Product.html";
+                    return;
+                }
+                checkoutItems = cart.map(item => ({
+                    productId: item._id,
+                    name: item.name,
+                    price: Number(item.price || 0),
+                    quantity: Number(item.quantity || 1),
+                    stock: Number(item.stock || 10),
+                    image: item.image
+                }));
+            } else if (singleProductStr) {
+                try {
+                    const product = JSON.parse(singleProductStr);
+                    checkoutItems = [{
+                        productId: product._id,
+                        name: product.name,
+                        price: Number(product.price || 0),
+                        quantity: 1,
+                        stock: Number(product.stock || 10),
+                        image: product.image
+                    }];
+                } catch (e) {
+                    window.location.href = "CCTV-Product.html";
+                    return;
+                }
+            } else {
+                window.location.href = "CCTV-Product.html";
+                return;
+            }
+
+            renderOrderSummary();
+        }
+
+        function renderOrderSummary() {
+            const container = document.getElementById("orderItemsSummary");
+            grandTotal = 0;
+
+            container.innerHTML = `
+                <div class="order-product">
+                    <h2 style="font-size: 20px; font-weight: 800; color: #2D5A5C; margin-bottom: 16px; border-bottom: 2px solid #F1F5F9; padding-bottom: 10px;">
+                        Selected Products (${checkoutItems.length})
+                    </h2>
+                    ${checkoutItems.map((item, index) => {
+                        const itemTotal = item.quantity * item.price;
+                        grandTotal += itemTotal;
+                        const img = resolveProductImage(item.image);
+
+                        return `
+                            <div class="order-item">
+                                <img
+                                    src="${escapeHTML(img)}"
+                                    alt="${escapeHTML(item.name)}"
+                                    class="order-item-image"
+                                    onerror="this.onerror=null; this.src='images/seethru-smart-dome.svg';"
+                                >
+                                <div class="order-item-details">
+                                    <h3>${escapeHTML(item.name)}</h3>
+                                    <p style="color: #64748B;">Unit Price: ₹${item.price.toLocaleString("en-IN")}</p>
+                                    
+                                    <div class="quantity-controls">
+                                        <button type="button" onclick="updateOrderQty(${index}, -1)">−</button>
+                                        <span>${item.quantity}</span>
+                                        <button type="button" onclick="updateOrderQty(${index}, 1)" ${item.quantity >= item.stock ? 'disabled' : ''}>+</button>
+                                        <span style="font-size: 12px; color: #64748B; margin-left: 8px;">(In Stock: ${item.stock})</span>
+                                    </div>
+
+                                    <p style="font-weight: 800; color: #2D5A5C; font-size: 16px;">
+                                        Subtotal: ₹${itemTotal.toLocaleString("en-IN")}
+                                    </p>
+                                </div>
+                            </div>
+                        `;
+                    }).join("")}
+
+                    <div style="margin-top: 20px; padding-top: 14px; border-top: 2px solid #F1F5F9; text-align: right;">
+                        <span class="order-total" style="font-size: 22px; font-weight: 800; color: #2D5A5C;">
+                            Total Amount Payable: ₹${grandTotal.toLocaleString("en-IN")}
+                        </span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateOrderQty(index, delta) {
+            if (!checkoutItems[index]) return;
+            const current = checkoutItems[index].quantity;
+            const stock = checkoutItems[index].stock;
+            const newQty = current + delta;
+
+            if (newQty <= 0) {
+                if (checkoutItems.length === 1) {
+                    alert("Order must have at least one product.");
+                    return;
+                }
+                checkoutItems.splice(index, 1);
+            } else if (newQty > stock) {
+                alert(`Cannot exceed available stock (${stock}).`);
+                return;
+            } else {
+                checkoutItems[index].quantity = newQty;
+            }
+
+            renderOrderSummary();
+        }
+
+        document.getElementById("placeOrderForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            if (checkoutItems.length === 0) {
+                alert("Please add items to your order.");
+                return;
+            }
+
+            const customer = getLoggedInCustomer();
+            if (!customer || !customer._id) {
+                alert("Please login to complete your order.");
+                window.location.href = "Login.html";
+                return;
+            }
+
+            const phone = document.getElementById("orderCustomerPhone").value.trim();
+            const address = document.getElementById("orderCustomerAddress").value.trim();
+            const notes = document.getElementById("orderNotes").value.trim();
+
+            if (!/^\d{10}$/.test(phone)) {
+                alert("Phone number must be exactly 10 digits.");
+                return;
+            }
+
+            if (!address) {
+                alert("Please provide the delivery / installation address.");
+                return;
+            }
+
+            const submitBtn = document.getElementById("submitOrderBtn");
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Processing Order...";
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/orders`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        customerId: customer._id,
+                        items: checkoutItems.map(i => ({
+                            productId: i.productId,
+                            name: i.name,
+                            quantity: i.quantity,
+                            price: i.price
+                        })),
+                        shippingAddress: address,
+                        contactPhone: phone,
+                        notes: notes
+                    })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || "Failed to create order.");
+                }
+
+                // Clean checkout states
+                localStorage.removeItem("checkoutCart");
+                localStorage.removeItem("selectedProduct");
+                saveCart([]); // clear cart
+
+                // Save pending payment info for Payment.html
+                localStorage.setItem("pendingPaymentOrder", JSON.stringify({
+                    orderId: result.order._id,
+                    orderNumber: result.order.orderNumber,
+                    amount: result.order.totalAmount,
+                    items: result.order.items
+                }));
+
+                alert(` Please complete your payment.`);
+                window.location.href = "Payment.html";
+            } catch (err) {
+                console.error("Order error:", err);
+                alert("Error placing order: " + err.message);
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Place Order & Proceed to Payment";
+            }
+        });
+
+        initializeOrderPage();
+    </script>
+
+</body>
+
+</html>

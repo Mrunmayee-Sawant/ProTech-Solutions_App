@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+```
+<title>ProTech Solutions - Customer Dashboard</title>
+
+<link rel="stylesheet" href="C-CSS.css">
+<link rel="icon" type="image/svg+xml" href="images/protech-logo.svg">
+```
+
+</head>
+
+<body>
+
+```
+<!-- =====================================================
+     HEADER
+====================================================== -->
+<header class="dashboard-header">
+
+    <div class="brand-wrapper">
+
+        <img
+            src="images/protech-logo.svg"
+            alt="ProTech Solutions"
+            class="brand-logo-img"
+        >
+
+        <div class="company-info">
+
+            <h2>
+                ProTech Solutions
+            </h2>
+
+            <p>
+                CCTV Service &amp; Sales
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="header-actions">
+
+        <!-- Cart -->
+        <a
+            href="Cart.html"
+            class="cart-link"
+            title="My Cart"
+        >
+            🛒
+            <span
+                id="cartCount"
+                class="cart-count"
+            >
+                0
+            </span>
+        </a>
+
+        <!-- Profile -->
+        <a
+            href="My-Profile.html"
+            class="profile-link"
+        >
+            👤 My Profile
+        </a>
+
+        <!-- =================================================
+             CUSTOMER LOGOUT
+
+             This does NOT call logout() from C-JS.js.
+             It directly clears the session.
+        ================================================== -->
+        <button
+            type="button"
+            class="logout-btn"
+            onclick="
+                localStorage.removeItem('loggedInCustomer');
+                localStorage.removeItem('loggedInStaff');
+                localStorage.removeItem('staffRole');
+                localStorage.removeItem('staffUsername');
+                localStorage.removeItem('staffEmail');
+                localStorage.removeItem('staffId');
+                localStorage.removeItem('adminSession');
+                localStorage.removeItem('staffSession');
+                sessionStorage.clear();
+                window.location.replace('Login.html');
+            "
+        >
+            Logout
+        </button>
+
+    </div>
+
+</header>
+
+
+<!-- =====================================================
+     WELCOME SECTION
+====================================================== -->
+<section class="welcome">
+
+    <h1>
+        Welcome, Customer!
+    </h1>
+
+    <p>
+        Manage your CCTV products, surveillance installations,
+        and service requests from one centralized dashboard.
+    </p>
+
+</section>
+
+
+<!-- =====================================================
+     DASHBOARD CARDS
+====================================================== -->
+<div class="dashboard-container">
+
+
+    <!-- =================================================
+         CCTV PRODUCTS
+    ================================================== -->
+    <div class="dashboard-card">
+
+        <div class="card-icon">
+            📹
+        </div>
+
+        <h3>
+            CCTV Products
+        </h3>
+
+        <p>
+            Browse high-definition CCTV cameras, NVRs,
+            accessories and place orders.
+        </p>
+
+        <a
+            href="CCTV-Product.html"
+            class="dashboard-link"
+        >
+            <button type="button">
+                View Products
+            </button>
+        </a>
+
+    </div>
+
+
+    <!-- =================================================
+         CCTV DETAILS
+    ================================================== -->
+    <div class="dashboard-card">
+
+        <div class="card-icon">
+            🏠
+        </div>
+
+        <h3>
+            CCTV Details
+        </h3>
+
+        <p>
+            Manage your installed CCTV cameras,
+            DVR/NVR information and installation records.
+        </p>
+
+        <a
+            href="CCTV-Detail.html"
+            class="dashboard-link"
+        >
+            <button type="button">
+                View CCTV Details
+            </button>
+        </a>
+
+    </div>
+
+
+    <!-- =================================================
+         SERVICE REQUEST
+    ================================================== -->
+    <div class="dashboard-card">
+
+        <div class="card-icon">
+            🔧
+        </div>
+
+        <h3>
+            Service Request
+        </h3>
+
+        <p>
+            Raise a service request for CCTV installation,
+            repair, maintenance or technical support.
+        </p>
+
+        <a
+            href="Service-Request.html"
+            class="dashboard-link"
+        >
+            <button type="button">
+                Request Service
+            </button>
+        </a>
+
+    </div>
+
+
+   
+
+    <!-- =================================================
+         BILLS
+    ================================================== -->
+    <div class="dashboard-card">
+
+        <div class="card-icon">
+            🧾
+        </div>
+
+        <h3>
+            Bills
+        </h3>
+
+        <p>
+            View your service invoices, pending bills,
+            GST details and payment status.
+        </p>
+
+        <a
+            href="Bill-Page.html"
+            class="dashboard-link"
+        >
+            <button type="button">
+                View Bills
+            </button>
+        </a>
+
+    </div>
+
+
+    <!-- =================================================
+         PAYMENT
+    ================================================== -->
+    <div class="dashboard-card">
+
+        <div class="card-icon">
+            💳
+        </div>
+
+        <h3>
+            Payment
+        </h3>
+
+        <p>
+            Pay your pending CCTV service bills
+            and manage your payment transactions.
+        </p>
+
+        <a
+            href="Payment.html"
+            class="dashboard-link"
+        >
+            <button type="button">
+                Make Payment
+            </button>
+        </a>
+
+    </div>
+
+
+    <!-- =================================================
+         HISTORY
+    ================================================== -->
+    <div class="dashboard-card">
+
+        <div class="card-icon">
+            📋
+        </div>
+
+        <h3>
+            History
+        </h3>
+
+        <p>
+            View your previous service requests,
+            payments and CCTV service history.
+        </p>
+
+        <a
+            href="History.html"
+            class="dashboard-link"
+        >
+            <button type="button">
+                View History
+            </button>
+        </a>
+
+    </div>
+
+
+    <!-- =================================================
+         PROFILE
+    ================================================== -->
+    <div class="dashboard-card">
+
+        <div class="card-icon">
+            👤
+        </div>
+
+        <h3>
+            My Profile
+        </h3>
+
+        <p>
+            View and manage your personal information,
+            contact details and account information.
+        </p>
+
+        <a
+            href="My-Profile.html"
+            class="dashboard-link"
+        >
+            <button type="button">
+                View Profile
+            </button>
+        </a>
+
+    </div>
+
+
+    <!-- =================================================
+         CONTACT US
+    ================================================== -->
+    <div class="customer-dashboard-card contact-us-card">
+
+        <div class="card-icon">
+            📞
+        </div>
+
+        <h3>
+            Contact Us — ProTech Solutions
+        </h3>
+
+        <p>
+
+            <strong>
+                Contact Number:
+            </strong>
+
+            7028941657 / 9930373839
+
+            <br><br>
+
+            <strong>
+                Email:
+            </strong>
+
+            protech.solutions2011@gmail.com
+
+            <br><br>
+
+            <strong>
+                Office Address:
+            </strong>
+
+            c-5, Shantiban CHS, Azad Nagar No.1,
+            Near Castle Mill, Thane,
+            Maharashtra-400601
+
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     MAIN JAVASCRIPT
+====================================================== -->
+<script src="C-JS.js"></script>
+```
+
+</body>
+
+</html>

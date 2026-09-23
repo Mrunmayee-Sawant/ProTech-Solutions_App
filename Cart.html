@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ProTech Solutions - Shopping Cart</title>
+
+    <link rel="stylesheet" href="C-CSS.css">
+    <link rel="icon" type="image/svg+xml" href="images/protech-logo.svg">
+</head>
+
+<body>
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="dashboard-header">
+
+        <div class="brand-wrapper">
+
+            <img
+                src="images/protech-logo.svg"
+                alt="ProTech Solutions"
+                class="brand-logo-img"
+            >
+
+            <div class="company-info">
+
+                <h2>ProTech Solutions</h2>
+
+                <p>
+                    CCTV Service &amp; Sales
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="header-actions">
+
+            <a href="CCTV-Product.html" class="nav-link">
+
+                <button
+                    type="button"
+                    class="logout-btn"
+                >
+                    Browse Products
+                </button>
+
+            </a>
+
+
+            <a href="Dashboard.html" class="nav-link">
+
+                <button
+                    type="button"
+                    class="logout-btn"
+                >
+                    Dashboard
+                </button>
+
+            </a>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =====================================================
+         WELCOME
+    ====================================================== -->
+
+    <section class="welcome">
+
+        <h1>
+            Your Shopping Cart
+        </h1>
+
+        <p>
+            Review selected CCTV equipment and accessories before
+            placing your order.
+        </p>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         CART
+    ====================================================== -->
+
+    <div class="cart-container">
+
+        <div id="cartItemsContainer">
+        </div>
+
+
+
+        <!-- =================================================
+             CART SUMMARY
+        ================================================== -->
+
+        <div
+            class="cart-summary"
+            id="cartSummary"
+            style="display:none;"
+        >
+
+            <h2>
+                Order Summary
+            </h2>
+
+
+            <div
+                class="details-card"
+                style="margin-bottom:20px;"
+            >
+
+                <p>
+
+                    <strong>
+                        Total Items:
+                    </strong>
+
+                    <span id="summaryTotalItems">
+                        0
+                    </span>
+
+                </p>
+
+
+                <p>
+
+                    <strong>
+                        Subtotal:
+                    </strong>
+
+                    ₹<span id="summarySubtotal">
+                        0
+                    </span>
+
+                </p>
+
+
+                <p>
+
+                    <strong>
+                        Delivery / Installation:
+                    </strong>
+
+                    Free Standard
+
+                </p>
+
+
+                <p class="cart-total">
+
+                    <strong>
+                        Grand Total:
+                    </strong>
+
+                    ₹<span id="summaryGrandTotal">
+                        0
+                    </span>
+
+                </p>
+
+            </div>
+
+
+
+            <div
+                style="
+                    display:flex;
+                    gap:14px;
+                    flex-wrap:wrap;
+                "
+            >
+
+                <button
+                    type="button"
+                    id="proceedCheckoutBtn"
+                    class="checkout-btn"
+                    style="flex:2;"
+                >
+                    Proceed to Checkout
+                </button>
+
+
+                <button
+                    type="button"
+                    id="clearCartBtn"
+                    class="remove-cart-btn"
+                    style="flex:1;"
+                >
+                    Clear Cart
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         MAIN PROJECT JAVASCRIPT
+    ====================================================== -->
+
+    <script src="C-JS.js"></script>
+
+
+
+    <!-- =====================================================
+         CART PAGE JAVASCRIPT
+         
+         IMPORTANT:
+         This page manages cart operations directly using
+         localStorage key: shoppingCart
+         
+         This prevents conflicts with C-JS.js.
+    ====================================================== -->
+
+    <script>
+
+        /* =====================================================
+           CART STORAGE KEY
+        ===================================================== */
+
+        const CART_PAGE_STORAGE_KEY = "shoppingCart";
+
+
+
+        /* =====================================================
+           SAFE HTML
+        ===================================================== */
+
+        function cartEscapeHTML(value) {
+
+            const div =
+                document.createElement("div");
+
+            div.textContent =
+                value == null ? "" : String(value);
+
+            return div.innerHTML;
+
+        }
+
+
+
+        /* =====================================================
+           GET CART DIRECTLY
+        ===================================================== */
+
+        function getCartDirectly() {
+
+            try {
+
+                const storedCart =
+                    localStorage.getItem(
+                        CART_PAGE_STORAGE_KEY
+                    );
+
+
+                if (!storedCart) {
+                    return [];
+                }
+
+
+                const parsedCart =
+                    JSON.parse(storedCart);
+
+
+                if (!Array.isArray(parsedCart)) {
+                    return [];
+                }
+
+
+                return parsedCart;
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Unable to read shopping cart:",
+                    error
+                );
+
+                return [];
+
+            }
+
+        }
+
+
+
+        /* =====================================================
+           SAVE CART DIRECTLY
+        ===================================================== */
+
+        function saveCartDirectly(cart) {
+
+            try {
+
+                localStorage.setItem(
+                    CART_PAGE_STORAGE_KEY,
+                    JSON.stringify(
+                        Array.isArray(cart)
+                            ? cart
+                            : []
+                    )
+                );
+
+
+                /*
+                 * Also update the main C-JS cart count
+                 * if that function exists.
+                 */
+
+                if (
+                    typeof updateCartCount === "function"
+                ) {
+
+                    updateCartCount();
+
+                }
+
+
+                return true;
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Unable to save shopping cart:",
+                    error
+                );
+
+                alert(
+                    "Unable to update your cart."
+                );
+
+                return false;
+
+            }
+
+        }
+
+
+
+        /* =====================================================
+           UPDATE CART COUNT
+        ===================================================== */
+
+        function updateCartPageCount() {
+
+            const cart =
+                getCartDirectly();
+
+
+            const totalQuantity =
+                cart.reduce(
+                    function (total, item) {
+
+                        return total +
+                            Number(
+                                item.quantity || 1
+                            );
+
+                    },
+                    0
+                );
+
+
+            const cartCount =
+                document.getElementById(
+                    "cartCount"
+                );
+
+
+            if (cartCount) {
+
+                cartCount.textContent =
+                    totalQuantity;
+
+            }
+
+        }
+
+
+
+        /* =====================================================
+           GET PRODUCT IMAGE
+        ===================================================== */
+
+        function getCartProductImage(item) {
+
+            if (
+                typeof resolveProductImage === "function"
+            ) {
+
+                try {
+
+                    return resolveProductImage(
+                        item.image
+                    );
+
+                }
+                catch (error) {
+
+                    console.warn(
+                        "Image resolver failed:",
+                        error
+                    );
+
+                }
+
+            }
+
+
+            return (
+                item.image ||
+                "images/seethru-smart-dome.svg"
+            );
+
+        }
+
+
+
+        /* =====================================================
+           RENDER CART
+        ===================================================== */
+
+        function renderCartPage() {
+
+            const container =
+                document.getElementById(
+                    "cartItemsContainer"
+                );
+
+
+            const summary =
+                document.getElementById(
+                    "cartSummary"
+                );
+
+
+            if (!container || !summary) {
+
+                console.error(
+                    "Cart page elements not found."
+                );
+
+                return;
+
+            }
+
+
+            const cart =
+                getCartDirectly();
+
+
+
+            /* =================================================
+               EMPTY CART
+            ================================================= */
+
+            if (
+                !Array.isArray(cart) ||
+                cart.length === 0
+            ) {
+
+                summary.style.display =
+                    "none";
+
+
+                container.innerHTML = `
+
+                    <div
+                        class="cart-card"
+                        style="
+                            text-align:center;
+                            padding:48px 24px;
+                        "
+                    >
+
+                        <div
+                            style="
+                                font-size:54px;
+                                margin-bottom:14px;
+                            "
+                        >
+                            🛒
+                        </div>
+
+
+                        <h3
+                            style="
+                                color:#2D5A5C;
+                                margin-bottom:8px;
+                            "
+                        >
+                            Your Shopping Cart is Empty
+                        </h3>
+
+
+                        <p
+                            style="
+                                color:#64748B;
+                                margin-bottom:24px;
+                            "
+                        >
+                            Looks like you haven't added any
+                            CCTV cameras or accessories yet.
+                        </p>
+
+
+                        <a
+                            href="CCTV-Product.html"
+                            style="text-decoration:none;"
+                        >
+
+                            <button
+                                type="button"
+                                class="submit-btn"
+                                style="
+                                    max-width:240px;
+                                    margin:0 auto;
+                                "
+                            >
+                                Browse CCTV Products
+                            </button>
+
+                        </a>
+
+                    </div>
+
+                `;
+
+
+                updateCartPageCount();
+
+                return;
+
+            }
+
+
+
+            /* =================================================
+               SHOW SUMMARY
+            ================================================= */
+
+            summary.style.display =
+                "block";
+
+
+            let totalQuantity = 0;
+
+            let subtotal = 0;
+
+
+
+            /* =================================================
+               GENERATE ITEMS
+            ================================================= */
+
+            container.innerHTML = `
+
+                <div class="cart-card">
+
+                    <h2
+                        style="
+                            font-size:20px;
+                            font-weight:800;
+                            color:#2D5A5C;
+                            margin-bottom:18px;
+                            border-bottom:2px solid #F1F5F9;
+                            padding-bottom:10px;
+                        "
+                    >
+                        Cart Items (${cart.length})
+                    </h2>
+
+
+                    ${cart.map(
+                        function(item, index) {
+
+                            const qty =
+                                Math.max(
+                                    1,
+                                    Number(
+                                        item.quantity || 1
+                                    )
+                                );
+
+
+                            const price =
+                                Number(
+                                    item.price || 0
+                                );
+
+
+                            const stock =
+                                Math.max(
+                                    1,
+                                    Number(
+                                        item.stock || 10
+                                    )
+                                );
+
+
+                            const itemTotal =
+                                qty * price;
+
+
+                            totalQuantity +=
+                                qty;
+
+
+                            subtotal +=
+                                itemTotal;
+
+
+                            const image =
+                                getCartProductImage(
+                                    item
+                                );
+
+
+                            const productName =
+                                item.name ||
+                                "CCTV Product";
+
+
+                            return `
+
+                                <div
+                                    class="cart-item"
+                                    data-cart-index="${index}"
+                                >
+
+                                    <!-- PRODUCT IMAGE -->
+
+                                    <img
+                                        src="${cartEscapeHTML(image)}"
+                                        alt="${cartEscapeHTML(productName)}"
+                                        class="cart-item-image"
+                                        onerror="
+                                            this.onerror=null;
+                                            this.src='images/seethru-smart-dome.svg';
+                                        "
+                                    >
+
+
+                                    <!-- PRODUCT DETAILS -->
+
+                                    <div class="cart-item-details">
+
+                                        <h3>
+                                            ${cartEscapeHTML(
+                                                productName
+                                            )}
+                                        </h3>
+
+
+                                        <p
+                                            style="
+                                                color:#64748B;
+                                                font-size:14px;
+                                            "
+                                        >
+                                            Unit Price:
+                                            ₹${price.toLocaleString("en-IN")}
+                                        </p>
+
+
+                                        <!-- QUANTITY -->
+
+                                        <div
+                                            class="quantity-controls"
+                                        >
+
+                                            <button
+                                                type="button"
+                                                class="cart-qty-btn"
+                                                data-action="minus"
+                                                data-index="${index}"
+                                            >
+                                                −
+                                            </button>
+
+
+                                            <span>
+                                                ${qty}
+                                            </span>
+
+
+                                            <button
+                                                type="button"
+                                                class="cart-qty-btn"
+                                                data-action="plus"
+                                                data-index="${index}"
+                                                ${qty >= stock ? "disabled" : ""}
+                                            >
+                                                +
+                                            </button>
+
+
+                                            <span
+                                                style="
+                                                    font-size:12px;
+                                                    color:#64748B;
+                                                    margin-left:8px;
+                                                "
+                                            >
+                                                (Max: ${stock})
+                                            </span>
+
+                                        </div>
+
+
+                                        <!-- ITEM TOTAL -->
+
+                                        <p
+                                            style="
+                                                font-weight:800;
+                                                color:#2D5A5C;
+                                                font-size:16px;
+                                            "
+                                        >
+
+                                            Item Total:
+
+                                            ₹${itemTotal.toLocaleString("en-IN")}
+
+                                        </p>
+
+                                    </div>
+
+
+
+                                    <!-- REMOVE -->
+
+                                    <button
+                                        type="button"
+                                        class="remove-cart-btn cart-remove-btn"
+                                        data-action="remove"
+                                        data-index="${index}"
+                                    >
+                                        Remove
+                                    </button>
+
+                                </div>
+
+                            `;
+
+                        }
+                    ).join("")}
+
+                </div>
+
+            `;
+
+
+
+            /* =================================================
+               SUMMARY
+            ================================================= */
+
+            const totalItemsElement =
+                document.getElementById(
+                    "summaryTotalItems"
+                );
+
+
+            const subtotalElement =
+                document.getElementById(
+                    "summarySubtotal"
+                );
+
+
+            const grandTotalElement =
+                document.getElementById(
+                    "summaryGrandTotal"
+                );
+
+
+            if (totalItemsElement) {
+
+                totalItemsElement.textContent =
+                    totalQuantity;
+
+            }
+
+
+            if (subtotalElement) {
+
+                subtotalElement.textContent =
+                    subtotal.toLocaleString(
+                        "en-IN"
+                    );
+
+            }
+
+
+            if (grandTotalElement) {
+
+                grandTotalElement.textContent =
+                    subtotal.toLocaleString(
+                        "en-IN"
+                    );
+
+            }
+
+
+            updateCartPageCount();
+
+        }
+
+
+
+        /* =====================================================
+           REMOVE ONE ITEM
+        ===================================================== */
+
+        function removeCartItemDirect(index) {
+
+            console.log(
+                "REMOVE CLICKED:",
+                index
+            );
+
+
+            const cart =
+                getCartDirectly();
+
+
+            index =
+                Number(index);
+
+
+            if (
+                !Number.isInteger(index) ||
+                index < 0 ||
+                index >= cart.length
+            ) {
+
+                console.error(
+                    "Invalid cart index:",
+                    index
+                );
+
+                return;
+
+            }
+
+
+            const productName =
+                cart[index].name ||
+                "this product";
+
+
+            const confirmed =
+                window.confirm(
+                    `Remove "${productName}" from your cart?`
+                );
+
+
+            if (!confirmed) {
+                return;
+            }
+
+
+            /* REMOVE */
+
+            cart.splice(
+                index,
+                1
+            );
+
+
+            /* SAVE */
+
+            const saved =
+                saveCartDirectly(cart);
+
+
+            if (!saved) {
+                return;
+            }
+
+
+            /* REFRESH */
+
+            renderCartPage();
+
+
+            console.log(
+                "Product removed successfully."
+            );
+
+        }
+
+
+
+        /* =====================================================
+           CHANGE QUANTITY
+        ===================================================== */
+
+        function changeCartQuantityDirect(
+            index,
+            delta
+        ) {
+
+            const cart =
+                getCartDirectly();
+
+
+            index =
+                Number(index);
+
+
+            delta =
+                Number(delta);
+
+
+            if (
+                !Number.isInteger(index) ||
+                !cart[index]
+            ) {
+
+                return;
+
+            }
+
+
+            const current =
+                Number(
+                    cart[index].quantity || 1
+                );
+
+
+            const stock =
+                Number(
+                    cart[index].stock || 10
+                );
+
+
+            const newQuantity =
+                current + delta;
+
+
+
+            /* =================================================
+               REMOVE IF ZERO
+            ================================================= */
+
+            if (newQuantity <= 0) {
+
+                removeCartItemDirect(
+                    index
+                );
+
+                return;
+
+            }
+
+
+
+            /* =================================================
+               STOCK LIMIT
+            ================================================= */
+
+            if (newQuantity > stock) {
+
+                alert(
+                    `Cannot exceed available stock (${stock}).`
+                );
+
+                return;
+
+            }
+
+
+            cart[index].quantity =
+                newQuantity;
+
+
+            saveCartDirectly(
+                cart
+            );
+
+
+            renderCartPage();
+
+        }
+
+
+
+        /* =====================================================
+           CLEAR ENTIRE CART
+        ===================================================== */
+
+        function clearEntireCartDirect() {
+
+            console.log(
+                "CLEAR CART CLICKED"
+            );
+
+
+            const cart =
+                getCartDirectly();
+
+
+            if (
+                !Array.isArray(cart) ||
+                cart.length === 0
+            ) {
+
+                alert(
+                    "Your cart is already empty."
+                );
+
+                return;
+
+            }
+
+
+            const confirmed =
+                window.confirm(
+                    "Are you sure you want to remove all items from your cart?"
+                );
+
+
+            if (!confirmed) {
+                return;
+            }
+
+
+            /* =================================================
+               CLEAR STORAGE
+            ================================================= */
+
+            localStorage.removeItem(
+                CART_PAGE_STORAGE_KEY
+            );
+
+
+            /*
+             * Make absolutely sure the key is empty.
+             */
+
+            localStorage.setItem(
+                CART_PAGE_STORAGE_KEY,
+                JSON.stringify([])
+            );
+
+
+            /* =================================================
+               REFRESH CART
+            ================================================= */
+
+            renderCartPage();
+
+
+            updateCartPageCount();
+
+
+            /*
+             * Also update C-JS count if available.
+             */
+
+            if (
+                typeof updateCartCount === "function"
+            ) {
+
+                updateCartCount();
+
+            }
+
+
+            console.log(
+                "Entire cart cleared successfully."
+            );
+
+        }
+
+
+
+        /* =====================================================
+           CHECKOUT
+        ===================================================== */
+
+        function proceedToCheckoutDirect() {
+
+            const cart =
+                getCartDirectly();
+
+
+            if (
+                !Array.isArray(cart) ||
+                cart.length === 0
+            ) {
+
+                alert(
+                    "Your cart is empty."
+                );
+
+                return;
+
+            }
+
+
+            localStorage.setItem(
+                "checkoutCart",
+                "true"
+            );
+
+
+            localStorage.removeItem(
+                "selectedProduct"
+            );
+
+
+            window.location.href =
+                "Order.html";
+
+        }
+
+
+
+        /* =====================================================
+           EVENT HANDLERS
+           
+           ONE SINGLE HANDLER FOR CART ITEMS
+        ===================================================== */
+
+        function setupCartEvents() {
+
+            const container =
+                document.getElementById(
+                    "cartItemsContainer"
+                );
+
+
+            if (!container) {
+
+                console.error(
+                    "Cart container not found."
+                );
+
+                return;
+
+            }
+
+
+            /*
+             * IMPORTANT:
+             * Only listen inside the cart container.
+             * This prevents C-JS global handlers from
+             * interfering with these buttons.
+             */
+
+            container.addEventListener(
+                "click",
+                function(event) {
+
+                    const removeButton =
+                        event.target.closest(
+                            "[data-action='remove']"
+                        );
+
+
+                    if (removeButton) {
+
+                        event.preventDefault();
+
+                        event.stopPropagation();
+
+
+                        const index =
+                            removeButton.getAttribute(
+                                "data-index"
+                            );
+
+
+                        removeCartItemDirect(
+                            index
+                        );
+
+
+                        return;
+
+                    }
+
+
+
+                    const quantityButton =
+                        event.target.closest(
+                            "[data-action]"
+                        );
+
+
+                    if (!quantityButton) {
+                        return;
+                    }
+
+
+                    const action =
+                        quantityButton.getAttribute(
+                            "data-action"
+                        );
+
+
+                    if (
+                        action !== "plus" &&
+                        action !== "minus"
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+
+                    if (
+                        quantityButton.disabled
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    const index =
+                        quantityButton.getAttribute(
+                            "data-index"
+                        );
+
+
+                    const delta =
+                        action === "plus"
+                            ? 1
+                            : -1;
+
+
+                    changeCartQuantityDirect(
+                        index,
+                        delta
+                    );
+
+                }
+            );
+
+        }
+
+
+
+        /* =====================================================
+           SETUP SUMMARY BUTTONS
+        ===================================================== */
+
+        function setupSummaryButtons() {
+
+            const clearButton =
+                document.getElementById(
+                    "clearCartBtn"
+                );
+
+
+            if (clearButton) {
+
+                clearButton.addEventListener(
+                    "click",
+                    function(event) {
+
+                        event.preventDefault();
+
+                        event.stopPropagation();
+
+                        clearEntireCartDirect();
+
+                    }
+                );
+
+            }
+
+
+            const checkoutButton =
+                document.getElementById(
+                    "proceedCheckoutBtn"
+                );
+
+
+            if (checkoutButton) {
+
+                checkoutButton.addEventListener(
+                    "click",
+                    function(event) {
+
+                        event.preventDefault();
+
+                        event.stopPropagation();
+
+                        proceedToCheckoutDirect();
+
+                    }
+                );
+
+            }
+
+        }
+
+
+
+        /* =====================================================
+           INITIALIZE
+        ===================================================== */
+
+        function initializeCartPage() {
+
+            console.log(
+                "ProTech Solutions Cart initialized."
+            );
+
+
+            renderCartPage();
+
+            setupCartEvents();
+
+            setupSummaryButtons();
+
+            updateCartPageCount();
+
+        }
+
+
+
+        /* =====================================================
+           DOM READY
+        ===================================================== */
+
+        if (
+            document.readyState === "loading"
+        ) {
+
+            document.addEventListener(
+                "DOMContentLoaded",
+                initializeCartPage
+            );
+
+        }
+        else {
+
+            initializeCartPage();
+
+        }
+
+    </script>
+
+</body>
+
+</html>

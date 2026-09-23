@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ProTech Solutions - CCTV Products</title>
+
+    <link rel="stylesheet" href="C-CSS.css">
+    <link rel="icon" type="image/svg+xml" href="images/protech-logo.svg">
+
+    <style>
+        .spec-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            background: rgba(15, 23, 42, 0.72);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .spec-modal.active {
+            display: flex;
+        }
+
+        .spec-modal-content {
+            width: min(650px, 95vw);
+            max-height: 90vh;
+            overflow-y: auto;
+            background: #ffffff;
+            border-radius: 18px;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.30);
+            padding: 28px;
+            position: relative;
+            animation: specificationPopup 0.22s ease-out;
+        }
+
+        @keyframes specificationPopup {
+            from {
+                opacity: 0;
+                transform: translateY(15px) scale(0.97);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .spec-close {
+            position: absolute;
+            top: 14px;
+            right: 16px;
+            width: 38px;
+            height: 38px;
+            border: none;
+            border-radius: 50%;
+            background: #f1f5f9;
+            color: #334155;
+            font-size: 22px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+
+        .spec-close:hover {
+            background: #e2e8f0;
+            transform: rotate(90deg);
+        }
+
+        .spec-modal-title {
+            margin: 0 45px 6px 0;
+            color: #173f42;
+            font-size: 25px;
+            font-weight: 800;
+        }
+
+        .spec-category {
+            display: inline-block;
+            margin-bottom: 18px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: #e7f3f3;
+            color: #2d5a5c;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .spec-image-wrapper {
+            width: 100%;
+            height: 220px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .spec-image-wrapper img {
+            max-width: 90%;
+            max-height: 190px;
+            object-fit: contain;
+        }
+
+        .spec-price {
+            font-size: 25px;
+            font-weight: 800;
+            color: #176b6e;
+            margin: 8px 0;
+        }
+
+        .spec-stock {
+            margin-bottom: 18px;
+            font-weight: 700;
+        }
+
+        .spec-stock.available {
+            color: #15803d;
+        }
+
+        .spec-stock.unavailable {
+            color: #dc2626;
+        }
+
+        .spec-description {
+            color: #475569;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        .spec-info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .spec-info-box {
+            padding: 14px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+        }
+
+        .spec-info-box strong {
+            display: block;
+            color: #334155;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .spec-info-box span {
+            color: #0f172a;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        @media (max-width: 600px) {
+            .spec-modal-content {
+                padding: 20px;
+            }
+
+            .spec-info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .spec-image-wrapper {
+                height: 180px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+
+    <header class="dashboard-header">
+
+        <div class="brand-wrapper">
+
+            <img
+                src="images/protech-logo.svg"
+                alt="ProTech Solutions"
+                class="brand-logo-img"
+            >
+
+            <div class="company-info">
+
+                <h2>
+                    ProTech Solutions
+                </h2>
+
+                <p>
+                    CCTV Service &amp; Sales
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="header-actions">
+
+            <a
+                href="Cart.html"
+                class="cart-link"
+                title="My Cart"
+            >
+                🛒
+
+                <span
+                    id="cartCount"
+                    class="cart-count"
+                >
+                    0
+                </span>
+            </a>
+
+            <a
+                href="Dashboard.html"
+                class="nav-link"
+            >
+                <button
+                    type="button"
+                    class="logout-btn"
+                >
+                    Dashboard
+                </button>
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- PAGE TITLE -->
+
+    <section class="welcome">
+
+        <h1>
+            CCTV Products Catalog
+        </h1>
+
+        <p>
+            Explore surveillance cameras, smart video door phones,
+            NVRs, and security accessories.
+        </p>
+
+    </section>
+
+
+    <!-- SEARCH -->
+
+    <div class="product-search">
+
+        <input
+            type="text"
+            id="productFilterInput"
+            placeholder="Search by product name, category, or features..."
+        >
+
+        <button
+            type="button"
+            id="productSearchBtn"
+        >
+            Search
+        </button>
+
+    </div>
+
+
+    <!-- PRODUCTS -->
+
+    <div
+        class="products-container"
+        id="productsContainer"
+    >
+
+        <p
+            class="no-details"
+            style="grid-column: 1 / -1;"
+        >
+            Loading CCTV products from database...
+        </p>
+
+    </div>
+
+
+    <!-- PRODUCT SPECIFICATION MODAL -->
+
+    <div
+        id="specModal"
+        class="spec-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="specModalTitle"
+    >
+
+        <div class="spec-modal-content">
+
+            <button
+                type="button"
+                id="specCloseBtn"
+                class="spec-close"
+                aria-label="Close specifications"
+            >
+                ×
+            </button>
+
+            <h2
+                id="specModalTitle"
+                class="spec-modal-title"
+            >
+                Product Specifications
+            </h2>
+
+            <span
+                id="specCategory"
+                class="spec-category"
+            >
+                CCTV
+            </span>
+
+            <div class="spec-image-wrapper">
+
+                <img
+                    id="specImage"
+                    src="images/seethru-smart-dome.svg"
+                    alt="Product"
+                >
+
+            </div>
+
+            <div
+                id="specPrice"
+                class="spec-price"
+            >
+                ₹0
+            </div>
+
+            <div
+                id="specStock"
+                class="spec-stock"
+            >
+                Stock information
+            </div>
+
+            <p
+                id="specDescription"
+                class="spec-description"
+            >
+                Product description
+            </p>
+
+            <div class="spec-info-grid">
+
+                <div class="spec-info-box">
+
+                    <strong>
+                        Product ID
+                    </strong>
+
+                    <span id="specProductId">
+                        -
+                    </span>
+
+                </div>
+
+                <div class="spec-info-box">
+
+                    <strong>
+                        Category
+                    </strong>
+
+                    <span id="specCategoryDetail">
+                        -
+                    </span>
+
+                </div>
+
+                <div class="spec-info-box">
+
+                    <strong>
+                        Availability
+                    </strong>
+
+                    <span id="specAvailability">
+                        -
+                    </span>
+
+                </div>
+
+                <div class="spec-info-box">
+
+                    <strong>
+                        Status
+                    </strong>
+
+                    <span id="specStatus">
+                        -
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- MAIN JAVASCRIPT -->
+
+    <script src="C-JS.js"></script>
+
+    <script>
+
+        let loadedProducts = [];
+
+
+        /* =========================================================
+           CART FUNCTIONS
+        ========================================================= */
+
+        function getCart() {
+
+            try {
+
+                return JSON.parse(
+                    localStorage.getItem("shoppingCart")
+                ) || [];
+
+            } catch (error) {
+
+                console.error(
+                    "Cart loading error:",
+                    error
+                );
+
+                return [];
+            }
+        }
+
+
+        function saveCart(cart) {
+
+            try {
+
+                localStorage.setItem(
+                    "shoppingCart",
+                    JSON.stringify(cart)
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "Cart saving error:",
+                    error
+                );
+            }
+        }
+
+
+        /* =========================================================
+           UPDATE CART COUNT
+        ========================================================= */
+
+        function updateCartCount() {
+
+            const cartCount =
+                document.getElementById(
+                    "cartCount"
+                );
+
+            if (!cartCount) {
+                return;
+            }
+
+            const cart =
+                getCart();
+
+            const count =
+                cart.reduce(
+                    (total, item) =>
+                        total +
+                        Number(
+                            item.quantity || 0
+                        ),
+                    0
+                );
+
+            cartCount.textContent =
+                count;
+        }
+
+
+        /* =========================================================
+           LOAD PRODUCTS
+        ========================================================= */
+
+        async function loadProducts() {
+
+            const container =
+                document.getElementById(
+                    "productsContainer"
+                );
+
+            try {
+
+                const response =
+                    await fetch(
+                        `${API_BASE_URL}/products`
+                    );
+
+                const result =
+                    await response.json();
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        result.message ||
+                        "Failed to load products."
+                    );
+                }
+
+                loadedProducts =
+                    Array.isArray(result.products)
+                        ? result.products
+                        : [];
+
+                if (
+                    loadedProducts.length === 0
+                ) {
+
+                    container.innerHTML = `
+
+                        <div
+                            class="details-card"
+                            style="
+                                grid-column: 1 / -1;
+                                text-align: center;
+                            "
+                        >
+
+                            <h3>
+                                No CCTV Products Available
+                            </h3>
+
+                            <p>
+                                Please check back later
+                                or contact support.
+                            </p>
+
+                        </div>
+
+                    `;
+
+                    return;
+                }
+
+                renderProducts(
+                    loadedProducts
+                );
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Product loading error:",
+                    error
+                );
+
+                container.innerHTML = `
+
+                    <div
+                        class="details-card"
+                        style="
+                            grid-column: 1 / -1;
+                            text-align: center;
+                        "
+                    >
+
+                        <h3 style="color:#DC2626;">
+                            Unable to Load Products
+                        </h3>
+
+                        <p>
+                            Could not connect to the
+                            backend server. Please verify
+                            database connection.
+                        </p>
+
+                    </div>
+
+                `;
+            }
+        }
+
+
+        /* =========================================================
+           RENDER PRODUCTS
+        ========================================================= */
+
+        function renderProducts(products) {
+
+            const container =
+                document.getElementById(
+                    "productsContainer"
+                );
+
+            if (
+                !Array.isArray(products) ||
+                products.length === 0
+            ) {
+
+                container.innerHTML = `
+
+                    <div
+                        class="details-card"
+                        style="
+                            grid-column: 1 / -1;
+                            text-align: center;
+                        "
+                    >
+
+                        <p class="no-details">
+                            No matching CCTV products found.
+                        </p>
+
+                    </div>
+
+                `;
+
+                return;
+            }
+
+            container.innerHTML =
+                products.map(
+                    product => {
+
+                        const imagePath =
+                            resolveProductImage(
+                                product.image
+                            );
+
+                        const price =
+                            Number(
+                                product.price || 0
+                            );
+
+                        const stock =
+                            Number(
+                                product.stock || 0
+                            );
+
+                        const inStock =
+                            stock > 0;
+
+                        const productId =
+                            String(
+                                product._id || ""
+                            );
+
+                        return `
+
+                            <div
+                                class="product-card"
+                            >
+
+                                <div
+                                    class="product-image"
+                                >
+
+                                    <img
+                                        src="${escapeHTML(imagePath)}"
+                                        alt="${escapeHTML(product.name || "CCTV Product")}"
+                                        class="product-real-image"
+                                        onerror="this.onerror=null; this.src='images/seethru-smart-dome.svg';"
+                                    >
+
+                                </div>
+
+                                <span
+                                    class="product-category-tag"
+                                >
+                                    ${escapeHTML(
+                                        product.category ||
+                                        "CCTV"
+                                    )}
+                                </span>
+
+                                <h3>
+                                    ${escapeHTML(
+                                        product.name ||
+                                        "CCTV Product"
+                                    )}
+                                </h3>
+
+                                <p>
+                                    ${escapeHTML(
+                                        product.description ||
+                                        "High quality security hardware."
+                                    )}
+                                </p>
+
+                                <h4>
+                                    ₹${price.toLocaleString("en-IN")}
+                                </h4>
+
+                                <p
+                                    class="${
+                                        inStock
+                                            ? "stock-available"
+                                            : "stock-unavailable"
+                                    }"
+                                >
+
+                                    ${
+                                        inStock
+                                            ? `● In Stock (${stock} available)`
+                                            : "● Currently Out of Stock"
+                                    }
+
+                                </p>
+
+                                <div
+                                    class="product-buttons"
+                                >
+
+                                    <button
+                                        type="button"
+                                        class="view-product-btn"
+                                        onclick="viewProductDetails('${productId}')"
+                                    >
+                                        View Specifications
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="add-cart-btn"
+                                        onclick="addToCart('${productId}')"
+                                        ${!inStock ? "disabled" : ""}
+                                    >
+                                        ${
+                                            inStock
+                                                ? "🛒 Add to Cart"
+                                                : "Out of Stock"
+                                        }
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="buy-btn"
+                                        onclick="buyNow('${productId}')"
+                                        ${!inStock ? "disabled" : ""}
+                                    >
+                                        Buy Now
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        `;
+                    }
+                ).join("");
+
+            console.log(
+                "Products rendered:",
+                products.length
+            );
+        }
+
+
+        /* =========================================================
+           SEARCH / FILTER
+        ========================================================= */
+
+        function filterProducts() {
+
+            const input =
+                document.getElementById(
+                    "productFilterInput"
+                );
+
+            const query =
+                input
+                    ? input.value
+                        .toLowerCase()
+                        .trim()
+                    : "";
+
+            if (!query) {
+
+                renderProducts(
+                    loadedProducts
+                );
+
+                return;
+            }
+
+            const filtered =
+                loadedProducts.filter(
+                    product => {
+
+                        return (
+
+                            (
+                                product.name &&
+                                String(product.name)
+                                    .toLowerCase()
+                                    .includes(query)
+                            )
+
+                            ||
+
+                            (
+                                product.category &&
+                                String(product.category)
+                                    .toLowerCase()
+                                    .includes(query)
+                            )
+
+                            ||
+
+                            (
+                                product.description &&
+                                String(product.description)
+                                    .toLowerCase()
+                                    .includes(query)
+                            )
+
+                        );
+                    }
+                );
+
+            renderProducts(
+                filtered
+            );
+        }
+
+
+        /* =========================================================
+           ADD TO CART
+        ========================================================= */
+
+        function addToCart(productId) {
+
+            console.log(
+                "Add to Cart clicked:",
+                productId
+            );
+
+            const product =
+                loadedProducts.find(
+                    p =>
+                        String(p._id) ===
+                        String(productId)
+                );
+
+            if (!product) {
+
+                console.error(
+                    "Product not found:",
+                    productId
+                );
+
+                return;
+            }
+
+            const stock =
+                Number(
+                    product.stock || 0
+                );
+
+            if (stock <= 0) {
+
+                return;
+            }
+
+            const cart =
+                getCart();
+
+            const existing =
+                cart.find(
+                    item =>
+                        String(item._id) ===
+                        String(product._id)
+                );
+
+            if (existing) {
+
+                if (
+                    Number(
+                        existing.quantity || 1
+                    ) >= stock
+                ) {
+
+                    return;
+                }
+
+                existing.quantity =
+                    Number(
+                        existing.quantity || 1
+                    ) + 1;
+
+            } else {
+
+                cart.push({
+
+                    _id:
+                        product._id,
+
+                    name:
+                        product.name,
+
+                    category:
+                        product.category,
+
+                    price:
+                        Number(
+                            product.price || 0
+                        ),
+
+                    stock:
+                        stock,
+
+                    image:
+                        product.image,
+
+                    quantity:
+                        1
+                });
+            }
+
+            saveCart(
+                cart
+            );
+
+            updateCartCount();
+
+            console.log(
+                "Product added to cart:",
+                product.name
+            );
+        }
+
+
+        /* =========================================================
+           BUY NOW
+        ========================================================= */
+
+        function buyNow(productId) {
+
+            const product =
+                loadedProducts.find(
+                    p =>
+                        String(p._id) ===
+                        String(productId)
+                );
+
+            if (!product) {
+
+                console.error(
+                    "Product not found:",
+                    productId
+                );
+
+                return;
+            }
+
+            if (
+                Number(product.stock || 0) <= 0
+            ) {
+
+                return;
+            }
+
+            localStorage.setItem(
+                "selectedProduct",
+                JSON.stringify(
+                    product
+                )
+            );
+
+            localStorage.removeItem(
+                "checkoutCart"
+            );
+
+            window.location.href =
+                "Order.html";
+        }
+
+
+        /* =========================================================
+           VIEW PRODUCT SPECIFICATIONS
+        ========================================================= */
+
+        function viewProductDetails(productId) {
+
+            console.log(
+                "View Specifications clicked:",
+                productId
+            );
+
+            const product =
+                loadedProducts.find(
+                    p =>
+                        String(p._id) ===
+                        String(productId)
+                );
+
+            if (!product) {
+
+                console.error(
+                    "Product not found:",
+                    productId
+                );
+
+                alert(
+                    "Unable to find this product."
+                );
+
+                return;
+            }
+
+            const modal =
+                document.getElementById(
+                    "specModal"
+                );
+
+            const image =
+                document.getElementById(
+                    "specImage"
+                );
+
+            const title =
+                document.getElementById(
+                    "specModalTitle"
+                );
+
+            const category =
+                document.getElementById(
+                    "specCategory"
+                );
+
+            const price =
+                document.getElementById(
+                    "specPrice"
+                );
+
+            const stock =
+                document.getElementById(
+                    "specStock"
+                );
+
+            const description =
+                document.getElementById(
+                    "specDescription"
+                );
+
+            const productIdEl =
+                document.getElementById(
+                    "specProductId"
+                );
+
+            const categoryDetail =
+                document.getElementById(
+                    "specCategoryDetail"
+                );
+
+            const availability =
+                document.getElementById(
+                    "specAvailability"
+                );
+
+            const status =
+                document.getElementById(
+                    "specStatus"
+                );
+
+            if (
+                !modal ||
+                !image ||
+                !title ||
+                !category ||
+                !price ||
+                !stock ||
+                !description ||
+                !productIdEl ||
+                !categoryDetail ||
+                !availability ||
+                !status
+            ) {
+
+                alert(
+                    "Unable to open product specifications."
+                );
+
+                return;
+            }
+
+            const imagePath =
+                resolveProductImage(
+                    product.image
+                );
+
+            const stockNumber =
+                Number(
+                    product.stock || 0
+                );
+
+            const isAvailable =
+                stockNumber > 0;
+
+            title.textContent =
+                product.name ||
+                "CCTV Product";
+
+            category.textContent =
+                product.category ||
+                "CCTV";
+
+            image.src =
+                imagePath;
+
+            image.alt =
+                product.name ||
+                "CCTV Product";
+
+            image.onerror =
+                function () {
+
+                    this.onerror =
+                        null;
+
+                    this.src =
+                        "images/seethru-smart-dome.svg";
+                };
+
+            price.textContent =
+                `₹${Number(
+                    product.price || 0
+                ).toLocaleString("en-IN")}`;
+
+            stock.textContent =
+                isAvailable
+                    ? `● In Stock (${stockNumber} available)`
+                    : "● Currently Out of Stock";
+
+            stock.className =
+                `spec-stock ${
+                    isAvailable
+                        ? "available"
+                        : "unavailable"
+                }`;
+
+            description.textContent =
+                product.description ||
+                "High quality security hardware.";
+
+            productIdEl.textContent =
+                product._id ||
+                "-";
+
+            categoryDetail.textContent =
+                product.category ||
+                "CCTV";
+
+            availability.textContent =
+                isAvailable
+                    ? `${stockNumber} available`
+                    : "Out of stock";
+
+            status.textContent =
+                product.status ||
+                (
+                    isAvailable
+                        ? "Available"
+                        : "Out of Stock"
+                );
+
+            modal.classList.add(
+                "active"
+            );
+
+            document.body.style.overflow =
+                "hidden";
+        }
+
+
+        /* =========================================================
+           CLOSE SPECIFICATION MODAL
+        ========================================================= */
+
+        function closeSpecificationModal() {
+
+            const modal =
+                document.getElementById(
+                    "specModal"
+                );
+
+            if (modal) {
+
+                modal.classList.remove(
+                    "active"
+                );
+            }
+
+            document.body.style.overflow =
+                "";
+        }
+
+
+        /* =========================================================
+           SEARCH BUTTON
+        ========================================================= */
+
+        document
+            .getElementById(
+                "productSearchBtn"
+            )
+            ?.addEventListener(
+                "click",
+                filterProducts
+            );
+
+
+        document
+            .getElementById(
+                "productFilterInput"
+            )
+            ?.addEventListener(
+                "keyup",
+                filterProducts
+            );
+
+
+        /* =========================================================
+           CLOSE MODAL BUTTON
+        ========================================================= */
+
+        document
+            .getElementById(
+                "specCloseBtn"
+            )
+            ?.addEventListener(
+                "click",
+                closeSpecificationModal
+            );
+
+
+        /* =========================================================
+           CLICK OUTSIDE MODAL
+        ========================================================= */
+
+        document
+            .getElementById(
+                "specModal"
+            )
+            ?.addEventListener(
+                "click",
+                function (event) {
+
+                    if (
+                        event.target === this
+                    ) {
+
+                        closeSpecificationModal();
+                    }
+                }
+            );
+
+
+        /* =========================================================
+           ESC KEY
+        ========================================================= */
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Escape"
+                ) {
+
+                    closeSpecificationModal();
+                }
+            }
+        );
+
+
+        /* =========================================================
+           START
+        ========================================================= */
+
+        updateCartCount();
+
+        loadProducts();
+
+    </script>
+
+</body>
+
+</html>

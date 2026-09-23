@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ProTech Solutions - Request CCTV Service</title>
+
+    <link rel="stylesheet" href="C-CSS.css">
+    <link rel="icon" type="image/svg+xml" href="images/protech-logo.svg">
+</head>
+
+<body>
+
+    <!-- Header -->
+
+    <header class="dashboard-header">
+
+        <div class="brand-wrapper">
+
+            <img
+                src="images/protech-logo.svg"
+                alt="ProTech Solutions"
+                class="brand-logo-img"
+            >
+
+            <div class="company-info">
+
+                <h2>
+                    ProTech Solutions
+                </h2>
+
+                <p>
+                    CCTV Service &amp; Sales
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="header-actions">
+
+            <a
+                href="Dashboard.html"
+                class="nav-link"
+            >
+
+                <button
+                    type="button"
+                    class="logout-btn"
+                >
+                    Dashboard
+                </button>
+
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- Page Title -->
+
+    <section class="welcome">
+
+        <h1>
+            Request CCTV Service &amp; Support
+        </h1>
+
+        <p>
+            Book a certified security technician for installation,
+            maintenance, or troubleshooting.
+        </p>
+
+    </section>
+
+
+    <!-- Service Request Form -->
+
+    <div class="request-form">
+
+        <h2>
+            Service Booking Form
+        </h2>
+
+
+        <form id="serviceBookingForm">
+
+
+            <!-- Service Type -->
+
+            <div class="form-group">
+
+                <label for="serviceType">
+                    Type of Service Required
+                </label>
+
+                <select
+                    id="serviceType"
+                    required
+                >
+
+                    <option value="New Installation">
+                        New CCTV Camera Installation
+                    </option>
+
+                    <option value="Repair / No Display">
+                        Repair / Camera Offline or No Display
+                    </option>
+
+                    <option value="DVR / NVR Storage Fix">
+                        NVR / DVR Storage &amp; HDD Formatting
+                    </option>
+
+                    <option value="Annual Maintenance (AMC)">
+                        Annual Maintenance Contract (AMC) Inspection
+                    </option>
+
+                    <option value="Camera Relocation">
+                        Camera Shifting / Re-wiring
+                    </option>
+
+                    <option value="Mobile App Live View Setup">
+                        Mobile App Remote Monitoring Setup
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- Date and Time -->
+
+            <div
+                style="
+                    display: flex;
+                    gap: 14px;
+                    flex-wrap: wrap;
+                "
+            >
+
+                <div
+                    class="form-group"
+                    style="
+                        flex: 1;
+                        min-width: 220px;
+                    "
+                >
+
+                    <label for="preferredDate">
+                        Preferred Service Date
+                    </label>
+
+                    <input
+                        type="date"
+                        id="preferredDate"
+                        required
+                        onclick="this.showPicker()"
+                    >
+
+                </div>
+
+
+                <div
+                    class="form-group"
+                    style="
+                        flex: 1;
+                        min-width: 220px;
+                    "
+                >
+
+                    <label for="preferredTime">
+                        Preferred Time Slot
+                    </label>
+
+                    <select
+                        id="preferredTime"
+                        required
+                    >
+
+                        <option value="Morning (9:00 AM - 12:00 PM)">
+                            Morning (9:00 AM - 12:00 PM)
+                        </option>
+
+                        <option value="Afternoon (12:00 PM - 4:00 PM)">
+                            Afternoon (12:00 PM - 4:00 PM)
+                        </option>
+
+                        <option value="Evening (4:00 PM - 7:00 PM)">
+                            Evening (4:00 PM - 7:00 PM)
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- Address -->
+
+            <div class="form-group">
+
+                <label for="serviceAddress">
+                    Premises Visit Address
+                </label>
+
+                <textarea
+                    id="serviceAddress"
+                    placeholder="Enter complete address where the technician needs to visit"
+                    rows="3"
+                    required
+                ></textarea>
+
+            </div>
+
+
+            <!-- Problem Description -->
+
+            <div class="form-group">
+
+                <label for="issueDescription">
+                    Description of Requirement / Issue
+                </label>
+
+                <textarea
+                    id="issueDescription"
+                    placeholder="Describe what needs to be serviced (e.g. 2 cameras flickering, wiring damaged, need additional angle)"
+                    rows="3"
+                    required
+                ></textarea>
+
+            </div>
+
+
+            <!-- Submit -->
+
+            <button
+                type="submit"
+                class="request-btn"
+                id="submitServiceReqBtn"
+            >
+                Submit Service Request
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- Common JavaScript -->
+
+    <script src="C-JS.js"></script>
+
+
+    <!-- Customer Service Request JavaScript -->
+
+    <script>
+
+        function initServiceRequestPage() {
+
+            const customer =
+                getLoggedInCustomer();
+
+
+            if (
+                customer &&
+                customer.address
+            ) {
+
+                document
+                    .getElementById(
+                        "serviceAddress"
+                    )
+                    .value =
+                    customer.address;
+
+            }
+
+
+            /*
+             * Get today's date using LOCAL time.
+             * This avoids the UTC problem.
+             */
+
+            const now =
+                new Date();
+
+
+            const today =
+                now.getFullYear() +
+                "-" +
+                String(
+                    now.getMonth() + 1
+                ).padStart(2, "0") +
+                "-" +
+                String(
+                    now.getDate()
+                ).padStart(2, "0");
+
+
+            const dateInput =
+                document.getElementById(
+                    "preferredDate"
+                );
+
+
+            /*
+             * Do not allow dates before today.
+             */
+
+            dateInput.min =
+                today;
+
+
+            /*
+             * Set today's date by default.
+             */
+
+            dateInput.value =
+                today;
+
+        }
+
+
+        document
+            .getElementById(
+                "serviceBookingForm"
+            )
+            .addEventListener(
+                "submit",
+                async function(e) {
+
+                    e.preventDefault();
+
+
+                    /* =========================
+                       CHECK LOGIN
+                    ========================= */
+
+                    const customer =
+                        getLoggedInCustomer();
+
+
+                    if (
+                        !customer ||
+                        !customer._id
+                    ) {
+
+                        alert(
+                            "Please login first."
+                        );
+
+                        window.location.href =
+                            "Login.html";
+
+                        return;
+
+                    }
+
+
+                    /* =========================
+                       GET FORM DATA
+                    ========================= */
+
+                    const serviceType =
+                        document
+                            .getElementById(
+                                "serviceType"
+                            )
+                            .value;
+
+
+                    const preferredDate =
+                        document
+                            .getElementById(
+                                "preferredDate"
+                            )
+                            .value;
+
+
+                    const preferredTime =
+                        document
+                            .getElementById(
+                                "preferredTime"
+                            )
+                            .value;
+
+
+                    /*
+                     * Get today's LOCAL date again
+                     * during submission.
+                     */
+
+                    const now =
+                        new Date();
+
+
+                    const today =
+                        now.getFullYear() +
+                        "-" +
+                        String(
+                            now.getMonth() + 1
+                        ).padStart(2, "0") +
+                        "-" +
+                        String(
+                            now.getDate()
+                        ).padStart(2, "0");
+
+
+                    /*
+                     * Reject yesterday and all
+                     * other past dates.
+                     */
+
+                    if (
+                        preferredDate < today
+                    ) {
+
+                        alert(
+                            "Please select today or a future date for the service request."
+                        );
+
+                        return;
+
+                    }
+
+
+                    const address =
+                        document
+                            .getElementById(
+                                "serviceAddress"
+                            )
+                            .value
+                            .trim();
+
+
+                    const description =
+                        document
+                            .getElementById(
+                                "issueDescription"
+                            )
+                            .value
+                            .trim();
+
+
+                    /* =========================
+                       CUSTOMER DETAILS
+                    ========================= */
+
+                    const customerName =
+                        customer.customerName ||
+                        customer.name ||
+                        customer.fullName ||
+                        customer.fullname ||
+                        "Customer";
+
+
+                    const mobile =
+                        customer.mobile ||
+                        customer.phone ||
+                        customer.phoneNumber ||
+                        "";
+
+
+                    if (!mobile) {
+
+                        alert(
+                            "Mobile number is missing from your profile. Please update your profile first."
+                        );
+
+                        return;
+
+                    }
+
+
+                    /* =========================
+                       SUBMIT BUTTON
+                    ========================= */
+
+                    const submitBtn =
+                        document.getElementById(
+                            "submitServiceReqBtn"
+                        );
+
+
+                    submitBtn.disabled =
+                        true;
+
+
+                    submitBtn.textContent =
+                        "Submitting Request...";
+
+
+                    try {
+
+                        /* =========================
+                           SEND REQUEST TO BACKEND
+                        ========================= */
+
+                        const response =
+                            await fetch(
+                                `${API_BASE_URL}/service-requests`,
+                                {
+
+                                    method:
+                                        "POST",
+
+                                    headers: {
+                                        "Content-Type":
+                                            "application/json"
+                                    },
+
+                                    body:
+                                        JSON.stringify({
+
+                                            customerId:
+                                                customer._id,
+
+                                            customerName:
+                                                customerName,
+
+                                            mobile:
+                                                String(
+                                                    mobile
+                                                ),
+
+                                            serviceType:
+                                                serviceType,
+
+                                            cctvType:
+                                                "CCTV",
+
+                                            problemDescription:
+                                                description,
+
+                                            serviceLocation:
+                                                address,
+
+                                            serviceDate:
+                                                preferredDate,
+
+                                            serviceTime:
+                                                preferredTime
+
+                                        })
+
+                                }
+                            );
+
+
+                        /* =========================
+                           READ SERVER RESPONSE
+                        ========================= */
+
+                        const result =
+                            await response.json();
+
+
+                        if (!response.ok) {
+
+                            throw new Error(
+                                result.error ||
+                                result.message ||
+                                "Failed to submit request."
+                            );
+
+                        }
+
+
+                        /* =========================
+                           GET CREATED REQUEST
+                        ========================= */
+
+                        const request =
+                            result.serviceRequest;
+
+
+                        if (!request) {
+
+                            throw new Error(
+                                "Service request was not created."
+                            );
+
+                        }
+
+
+                        /* =========================
+                           SUCCESS MESSAGE
+                        ========================= */
+
+                        alert(
+                            `Service Request #${
+                                request.requestId
+                            } Submitted!\n\n` +
+
+                            `Our technician will be assigned for ${
+                                formatDate(
+                                    preferredDate
+                                )
+                            } (${preferredTime}).`
+                        );
+
+
+                        /* =========================
+                           GO TO CUSTOMER DASHBOARD
+                        ========================= */
+
+                        window.location.href =
+                            "Dashboard.html";
+
+
+                    } catch (err) {
+
+                        console.error(
+                            "Service request error:",
+                            err
+                        );
+
+
+                        alert(
+                            "Error: " +
+                            err.message
+                        );
+
+
+                        submitBtn.disabled =
+                            false;
+
+
+                        submitBtn.textContent =
+                            "Submit Service Request";
+
+                    }
+
+                }
+            );
+
+
+        /* =========================
+           START CUSTOMER PAGE
+        ========================= */
+
+        initServiceRequestPage();
+
+    </script>
+
+</body>
+
+</html>

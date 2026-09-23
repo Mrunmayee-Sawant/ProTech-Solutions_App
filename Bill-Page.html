@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ProTech Solutions - My Invoices & Bills</title>
+
+    <link rel="stylesheet" href="C-CSS.css">
+    <link rel="icon" type="image/svg+xml" href="images/protech-logo.svg">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="dashboard-header">
+
+        <div class="brand-wrapper">
+
+            <img
+                src="images/protech-logo.svg"
+                alt="ProTech Solutions"
+                class="brand-logo-img"
+            >
+
+            <div class="company-info">
+
+                <h2>
+                    ProTech Solutions
+                </h2>
+
+                <p>
+                    CCTV Service &amp; Sales
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="header-actions">
+
+            <a
+                href="Dashboard.html"
+                class="nav-link"
+            >
+
+                <button
+                    type="button"
+                    class="logout-btn"
+                >
+                    Dashboard
+                </button>
+
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <section class="welcome">
+
+        <h1>
+            My Service &amp; Product Bills
+        </h1>
+
+        <p>
+            View your official tax invoices, payment records,
+            and settle pending amounts.
+        </p>
+
+    </section>
+
+
+    <div
+        class="bills-container"
+        id="billsContainer"
+    >
+
+        <p class="no-details">
+            Loading your bills...
+        </p>
+
+    </div>
+
+
+    <script src="C-JS.js"></script>
+
+
+    <script>
+
+        /* =========================
+           LOAD CUSTOMER BILLS
+        ========================= */
+
+        async function loadCustomerBills() {
+
+            const container =
+                document.getElementById(
+                    "billsContainer"
+                );
+
+
+            const customer =
+                getLoggedInCustomer();
+
+
+            /* CHECK LOGIN */
+
+            if (
+                !customer ||
+                !customer._id
+            ) {
+
+                container.innerHTML = `
+
+                    <div
+                        class="details-card"
+                        style="text-align:center;"
+                    >
+
+                        <p class="no-details">
+                            Please log in to view your bills.
+                        </p>
+
+                    </div>
+
+                `;
+
+                return;
+
+            }
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        `${API_BASE_URL}/bills/customer/${customer._id}`
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                console.log(
+                    "Bills response:",
+                    result
+                );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        result.message ||
+                        "Failed to fetch bills."
+                    );
+
+                }
+
+
+                const bills =
+                    Array.isArray(result.bills)
+                        ? result.bills
+                        : [];
+
+
+                /* NO BILLS */
+
+                if (
+                    bills.length === 0
+                ) {
+
+                    container.innerHTML = `
+
+                        <div
+                            class="details-card"
+                            style="
+                                text-align:center;
+                                padding:40px 20px;
+                            "
+                        >
+
+                            <div
+                                style="
+                                    font-size:48px;
+                                    margin-bottom:12px;
+                                "
+                            >
+                                🧾
+                            </div>
+
+                            <h3
+                                style="
+                                    color:#2D5A5C;
+                                    margin-bottom:8px;
+                                "
+                            >
+                                No Invoices Found
+                            </h3>
+
+                            <p
+                                style="
+                                    color:#64748B;
+                                "
+                            >
+                                You do not have any bills
+                                generated yet.
+                            </p>
+
+                        </div>
+
+                    `;
+
+                    return;
+
+                }
+
+
+                /* DISPLAY BILLS */
+
+                container.innerHTML =
+                    bills.map(
+                        bill => {
+
+                            /* =========================
+                               PAYMENT STATUS
+                            ========================= */
+
+                            const isPaid =
+                                (
+                                    bill.status ||
+                                    ""
+                                ).toLowerCase() ===
+                                "paid";
+
+
+                            const total =
+                                Number(
+                                    bill.totalAmount ||
+                                    0
+                                );
+
+
+                            const gst =
+                                Number(
+                                    bill.gst ||
+                                    0
+                                );
+
+
+                            const paidAmount =
+                                Number(
+                                    bill.paidAmount ||
+                                    0
+                                );
+
+
+                            const balanceAmount =
+                                Number(
+                                    bill.balanceAmount !== undefined
+                                        ? bill.balanceAmount
+                                        : total - paidAmount
+                                );
+
+
+                            const serviceCharge =
+                                Number(
+                                    bill.serviceCharge ||
+                                    0
+                                );
+
+
+                            const billDate =
+                                bill.billDate
+                                    ? new Date(
+                                        bill.billDate
+                                    ).toLocaleDateString(
+                                        "en-IN"
+                                    )
+                                    : "N/A";
+
+
+                            /* =========================
+                               BILL TYPE
+                            ========================= */
+
+                            const billType =
+                                bill.billType ||
+                                "N/A";
+
+
+                            /* =========================
+                               PRODUCT DETAILS
+                            ========================= */
+
+                            let productName =
+                                "N/A";
+
+
+                            let quantity =
+                                "";
+
+
+                            if (
+                                bill.orderId &&
+                                bill.orderId.product
+                            ) {
+
+                                productName =
+                                    bill.orderId.product.name ||
+                                    "Product";
+
+
+                                quantity =
+                                    bill.orderId.quantity ||
+                                    1;
+
+                            }
+
+
+                            /* =========================
+                               DETAILS
+                            ========================= */
+
+                            let billSpecificDetails = "";
+
+
+                            if (
+                                billType === "Service"
+                            ) {
+
+                                billSpecificDetails = `
+
+                                    <p>
+                                        <strong>
+                                            Service Type:
+                                        </strong>
+
+                                        ${escapeHTML(
+                                            bill.serviceType ||
+                                            "N/A"
+                                        )}
+                                    </p>
+
+
+                                    <p>
+                                        <strong>
+                                            Request ID:
+                                        </strong>
+
+                                        ${escapeHTML(
+                                            bill.requestId ||
+                                            "N/A"
+                                        )}
+                                    </p>
+
+
+                                    <p>
+                                        <strong>
+                                            Service Charge:
+                                        </strong>
+
+                                        ₹${serviceCharge.toLocaleString(
+                                            "en-IN"
+                                        )}
+                                    </p>
+
+                                `;
+
+                            } else {
+
+                                billSpecificDetails = `
+
+                                    <p>
+                                        <strong>
+                                            Product:
+                                        </strong>
+
+                                        ${escapeHTML(
+                                            productName
+                                        )}
+                                    </p>
+
+
+                                    <p>
+                                        <strong>
+                                            Quantity:
+                                        </strong>
+
+                                        ${quantity || "N/A"}
+
+                                    </p>
+
+                                `;
+
+                            }
+
+
+                            /* =========================
+                               RETURN BILL CARD
+                            ========================= */
+
+                            return `
+
+                                <div class="bill-card">
+
+
+                                    <!-- BILL HEADER -->
+
+                                    <div class="bill-header">
+
+                                        <div>
+
+                                            <h3>
+                                                Invoice #${escapeHTML(
+                                                    bill.billId ||
+                                                    "N/A"
+                                                )}
+                                            </h3>
+
+
+                                            <p
+                                                style="
+                                                    color:#64748B;
+                                                    font-size:13px;
+                                                "
+                                            >
+
+                                                Date:
+                                                ${billDate}
+
+                                            </p>
+
+
+                                            <p
+                                                style="
+                                                    color:#64748B;
+                                                    font-size:13px;
+                                                "
+                                            >
+
+                                                Bill Type:
+                                                <strong>
+                                                    ${escapeHTML(
+                                                        billType
+                                                    )}
+                                                </strong>
+
+                                            </p>
+
+                                        </div>
+
+
+                                        <span
+                                            class="bill-status ${
+                                                isPaid
+                                                    ? "bill-paid"
+                                                    : "bill-pending"
+                                            }"
+                                        >
+
+                                            ${
+                                                isPaid
+                                                    ? "● Paid"
+                                                    : "● Payment Pending"
+                                            }
+
+                                        </span>
+
+                                    </div>
+
+
+                                    <!-- BILL DETAILS -->
+
+                                    <div class="bill-details">
+
+
+                                        <p>
+
+                                            <strong>
+                                                Customer Name:
+                                            </strong>
+
+                                            ${escapeHTML(
+                                                customer.name ||
+                                                "N/A"
+                                            )}
+
+                                        </p>
+
+
+                                        <p>
+
+                                            <strong>
+                                                Contact:
+                                            </strong>
+
+                                            ${escapeHTML(
+                                                customer.phone ||
+                                                "N/A"
+                                            )}
+
+                                        </p>
+
+
+                                        ${billSpecificDetails}
+
+
+                                        <p>
+
+                                            <strong>
+                                                GST:
+                                            </strong>
+
+                                            ₹${gst.toLocaleString(
+                                                "en-IN"
+                                            )}
+
+                                        </p>
+
+
+                                        <p
+                                            style="
+                                                font-size:18px;
+                                                font-weight:800;
+                                                color:#2D5A5C;
+                                                margin-top:8px;
+                                            "
+                                        >
+
+                                            <strong>
+                                                Total Amount:
+                                            </strong>
+
+                                            ₹${total.toLocaleString(
+                                                "en-IN"
+                                            )}
+
+                                        </p>
+
+
+                                        <p>
+
+                                            <strong>
+                                                Paid Amount:
+                                            </strong>
+
+                                            ₹${paidAmount.toLocaleString(
+                                                "en-IN"
+                                            )}
+
+                                        </p>
+
+
+                                        <p>
+
+                                            <strong>
+                                                Balance Amount:
+                                            </strong>
+
+                                            ₹${balanceAmount.toLocaleString(
+                                                "en-IN"
+                                            )}
+
+                                        </p>
+
+
+                                    </div>
+
+
+                                    <!-- BUTTONS -->
+
+                                    <div
+                                        style="
+                                            display:flex;
+                                            gap:12px;
+                                            margin-top:18px;
+                                        "
+                                    >
+
+
+                                        ${
+                                            !isPaid &&
+                                            balanceAmount > 0
+                                                ? `
+
+                                            <button
+                                                type="button"
+                                                class="pay-bill-btn"
+                                                onclick="payThisBill(
+                                                    '${bill._id}',
+                                                    '${bill.billId}',
+                                                    ${balanceAmount}
+                                                )"
+                                            >
+
+                                                💳 Pay Now
+                                                (₹${balanceAmount.toLocaleString(
+                                                    "en-IN"
+                                                )})
+
+                                            </button>
+
+                                            `
+                                                : `
+
+                                            <span
+                                                style="
+                                                    color:#059669;
+                                                    font-weight:700;
+                                                    font-size:14px;
+                                                    display:inline-flex;
+                                                    align-items:center;
+                                                    gap:6px;
+                                                "
+                                            >
+
+                                                ✓ Invoice Cleared &amp; Paid
+
+                                            </span>
+
+                                            `
+                                        }
+
+
+                                        <button
+                                            type="button"
+                                            class="dashboard-btn"
+                                            onclick="window.print()"
+                                            style="margin-left:auto;"
+                                        >
+
+                                            🖨️ Print Invoice
+
+                                        </button>
+
+
+                                    </div>
+
+
+                                </div>
+
+                            `;
+
+                        }
+                    ).join("");
+
+
+            } catch (error) {
+
+                console.error(
+                    "Bills error:",
+                    error
+                );
+
+
+                container.innerHTML = `
+
+                    <div
+                        class="details-card"
+                        style="text-align:center;"
+                    >
+
+                        <p
+                            class="no-details"
+                            style="color:#DC2626;"
+                        >
+
+                            Failed to load bills.
+
+                        </p>
+
+
+                        <p
+                            style="
+                                color:#64748B;
+                                font-size:14px;
+                                margin-top:8px;
+                            "
+                        >
+
+                            ${escapeHTML(
+                                error.message ||
+                                "Please try again."
+                            )}
+
+                        </p>
+
+                    </div>
+
+                `;
+
+            }
+
+        }
+
+
+        /* =========================
+           PAY BILL
+        ========================= */
+
+        function payThisBill(
+            billId,
+            billNumber,
+            amount
+        ) {
+
+            localStorage.setItem(
+                "pendingBillPayment",
+                JSON.stringify({
+
+                    billId:
+                        billId,
+
+                    billNumber:
+                        billNumber,
+
+                    amount:
+                        amount
+
+                })
+            );
+
+
+            localStorage.removeItem(
+                "pendingPaymentOrder"
+            );
+
+
+            window.location.href =
+                "Payment.html";
+
+        }
+
+
+        /* =========================
+           LOAD BILLS
+        ========================= */
+
+        loadCustomerBills();
+
+    </script>
+
+</body>
+
+</html>

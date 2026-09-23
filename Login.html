@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        ProTech Solutions - Login
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="C-CSS.css"
+    >
+
+    <link
+        rel="icon"
+        type="image/svg+xml"
+        href="images/protech-logo.svg"
+    >
+
+</head>
+
+
+<body>
+
+
+    <div class="login-container">
+
+
+        <!-- =====================================================
+             PROTECH SOLUTIONS LOGO
+        ====================================================== -->
+
+        <a
+            href="Login.html"
+            style="text-decoration:none;"
+        >
+
+            <img
+                src="images/protech-logo.svg"
+                alt="ProTech Solutions Logo"
+                class="login-logo"
+            >
+
+        </a>
+
+
+        <h1>
+            Customer Login
+        </h1>
+
+
+        <p class="subtitle">
+            Access your CCTV surveillance &amp; service account
+        </p>
+
+
+
+        <!-- =====================================================
+             LOGIN FORM
+        ====================================================== -->
+
+        <form
+            id="loginForm"
+            autocomplete="on"
+            novalidate
+        >
+
+
+            <!-- =================================================
+                 EMAIL
+            ================================================== -->
+
+            <div class="form-group">
+
+                <label for="email">
+                    Email Address
+                </label>
+
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Enter your registered email"
+                    required
+                    autocomplete="email"
+                >
+
+            </div>
+
+
+
+            <!-- =================================================
+                 PASSWORD
+            ================================================== -->
+
+            <div class="form-group">
+
+                <label for="password">
+                    Password
+                </label>
+
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    required
+                    autocomplete="current-password"
+                >
+
+            </div>
+
+
+
+            <!-- =================================================
+                 USER TYPE
+            ================================================== -->
+
+            <div class="user-type">
+
+                <label>
+
+                    <input
+                        type="radio"
+                        name="userType"
+                        value="customer"
+                        checked
+                    >
+
+                    Customer
+
+                </label>
+
+
+                <label>
+
+                    <input
+                        type="radio"
+                        name="userType"
+                        value="staff"
+                        onchange="window.location.href='S_Login.html'"
+                    >
+
+                    Staff / Admin
+
+                </label>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 LOGIN BUTTON
+                 
+                 IMPORTANT:
+                 type="button" prevents normal browser form
+                 submission. C-JS.js handles the login.
+            ================================================== -->
+
+            <button
+                type="button"
+                id="customerLoginBtn"
+                class="submit-btn"
+            >
+                Login to Dashboard
+            </button>
+
+
+
+            <!-- =================================================
+                 FORGOT PASSWORD
+            ================================================== -->
+
+            <div class="forgot-password-link">
+
+                <a href="ForgotPassword.html">
+                    Forgot Password?
+                </a>
+
+            </div>
+
+
+        </form>
+
+
+
+        <!-- =====================================================
+             REGISTRATION
+        ====================================================== -->
+
+        <p class="register">
+
+            New Customer?
+
+            <a href="Registration.html">
+                Create an Account
+            </a>
+
+        </p>
+
+
+
+        <!-- =====================================================
+             STAFF LOGIN
+        ====================================================== -->
+
+        <p
+            class="register"
+            style="
+                margin-top:10px;
+                padding-top:12px;
+                border-top:1px dashed #CBD5E1;
+            "
+        >
+
+            Staff or Administrator?
+
+            <a href="S_Login.html">
+                Staff Portal Login
+            </a>
+
+        </p>
+
+
+    </div>
+
+
+
+    <!-- =====================================================
+         MAIN JAVASCRIPT
+    ====================================================== -->
+
+    <script src="C-JS.js"></script>
+
+
+
+    <!-- =====================================================
+         LOGIN KEYBOARD BEHAVIOUR
+
+         Email + ENTER
+             → Password
+
+         Password + ENTER
+             → Login
+
+         IMPORTANT:
+         This script does NOT perform login itself.
+         The actual login and wrong-password handling are
+         performed by C-JS.js.
+    ====================================================== -->
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                const loginForm =
+                    document.getElementById(
+                        "loginForm"
+                    );
+
+
+                const emailInput =
+                    document.getElementById(
+                        "email"
+                    );
+
+
+                const passwordInput =
+                    document.getElementById(
+                        "password"
+                    );
+
+
+                const loginButton =
+                    document.getElementById(
+                        "customerLoginBtn"
+                    );
+
+
+
+                /* =================================================
+                   EMAIL ENTER
+
+                   Pressing ENTER inside email moves the cursor
+                   directly to the password field.
+                ================================================== */
+
+                if (
+                    emailInput &&
+                    passwordInput
+                ) {
+
+                    emailInput.addEventListener(
+                        "keydown",
+                        function (event) {
+
+                            if (
+                                event.key === "Enter"
+                            ) {
+
+                                event.preventDefault();
+
+
+                                /*
+                                 * Validate email before moving
+                                 * to the password field.
+                                 */
+
+                                if (
+                                    !emailInput.checkValidity()
+                                ) {
+
+                                    emailInput.reportValidity();
+
+                                    return;
+
+                                }
+
+
+                                passwordInput.focus();
+
+                            }
+
+                        }
+                    );
+
+                }
+
+
+
+                /* =================================================
+                   PASSWORD ENTER
+
+                   Pressing ENTER inside password triggers the
+                   same login button used by mouse click.
+                ================================================== */
+
+                if (
+                    passwordInput &&
+                    loginButton
+                ) {
+
+                    passwordInput.addEventListener(
+                        "keydown",
+                        function (event) {
+
+                            if (
+                                event.key === "Enter"
+                            ) {
+
+                                event.preventDefault();
+
+
+                                /*
+                                 * Trigger the C-JS.js login
+                                 * button handler.
+                                 */
+
+                                loginButton.click();
+
+                            }
+
+                        }
+                    );
+
+                }
+
+
+
+                /* =================================================
+                   FORM SUBMIT PROTECTION
+
+                   Prevents the browser from performing a normal
+                   form submission or page refresh.
+
+                   The actual login is handled by C-JS.js.
+                ================================================== */
+
+                if (loginForm) {
+
+                    loginForm.addEventListener(
+                        "submit",
+                        function (event) {
+
+                            event.preventDefault();
+
+
+                            if (loginButton) {
+
+                                loginButton.click();
+
+                            }
+
+                        }
+                    );
+
+                }
+
+            }
+        );
+
+    </script>
+
+
+</body>
+
+</html>

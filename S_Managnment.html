@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProTech Solutions - Customer Management</title>
+    <link rel="stylesheet" href="C-CSS.css">
+    <link rel="icon" type="image/svg+xml" href="images/protech-logo.svg">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="dashboard-header">
+
+        <div class="brand-wrapper">
+            <img src="images/protech-logo.svg" alt="ProTech Solutions" class="brand-logo-img">
+            <div class="company-info">
+                <h2>ProTech Solutions</h2>
+                <p>Staff &amp; Admin Panel</p>
+            </div>
+        </div>
+
+        <div class="staff-header-right">
+            <span id="staffRoleDisplay">Staff</span>
+            <a href="S_Dashboard.html" class="nav-link">
+                <button type="button" class="dashboard-btn">
+                    Staff Dashboard
+                </button>
+            </a>
+            <button type="button" class="logout-btn" onclick="staffLogout()">
+                Logout
+            </button>
+        </div>
+
+    </header>
+
+    <section class="welcome">
+        <h1>Customer Management</h1>
+        <p>View registered clients, monitor their installed surveillance setups, and manage customer records.</p>
+    </section>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <input
+            type="text"
+            id="customerSearchInput"
+            placeholder="Search by customer name, 10-digit mobile, or email address..."
+            onkeyup="filterCustomers()"
+        >
+        <button type="button" onclick="filterCustomers()">Search</button>
+    </div>
+
+    <!-- Customer Table Container -->
+    <div class="report-list">
+        <h2>Registered Customers (<span id="customerCount">0</span>)</h2>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer Name</th>
+                        <th>Mobile Number</th>
+                        <th>Email</th>
+                        <th>Registered Address</th>
+                        <th>Joined</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="customersTableBody">
+                    <tr>
+                        <td colspan="6" style="text-align: center;">Loading registered customers...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Customer Details Modal Area -->
+    <div id="customerDetailModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;">
+        <div style="background: #FFFFFF; border-radius: 16px; padding: 28px; width: 90%; max-width: 640px; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #F1F5F9; padding-bottom: 12px; margin-bottom: 16px;">
+                <h3 id="modalCustomerName" style="color: #2D5A5C; font-size: 20px; font-weight: 800;">Customer Information</h3>
+                <button type="button" onclick="closeCustomerModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #64748B;">✕</button>
+            </div>
+            <div id="modalCustomerContent">
+                <!-- Dynamic Content -->
+            </div>
+        </div>
+    </div>
+
+    <script src="C-JS.js"></script>
+
+    <script>
+        let allCustomers = [];
+
+        async function loadCustomers() {
+            const tbody = document.getElementById("customersTableBody");
+            try {
+                const response = await fetch(`${API_BASE_URL}/customers`);
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || "Failed to load customers.");
+                }
+
+                allCustomers = result.customers || [];
+                document.getElementById("customerCount").textContent = allCustomers.length;
+                renderCustomers(allCustomers);
+            } catch (err) {
+                console.error("Customers error:", err);
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#DC2626;">Error loading customers: ${err.message}</td></tr>`;
+            }
+        }
+
+        function renderCustomers(customers) {
+            const tbody = document.getElementById("customersTableBody");
+
+            if (customers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 24px; color:#64748B;">No matching customers found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = customers.map(c => `
+                <tr>
+                    <td><strong>${escapeHTML(c.name)}</strong></td>
+                    <td>${escapeHTML(c.phone || "-")}</td>
+                    <td>${escapeHTML(c.email || "-")}</td>
+                    <td style="max-width: 220px; font-size: 13px;">${escapeHTML(c.address || "-")}</td>
+                    <td>${formatDate(c.createdAt)}</td>
+                    <td>
+                        <button type="button" onclick="viewCustomerSetup('${c._id}')">
+                            Setup &amp; History
+                        </button>
+                        <button type="button" class="remove-cart-btn" style="background:#FEE2E2; color:#DC2626;" onclick="deleteCustomer('${c._id}')">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            `).join("");
+        }
+
+        function filterCustomers() {
+            const query = document.getElementById("customerSearchInput").value.toLowerCase().trim();
+            if (!query) {
+                renderCustomers(allCustomers);
+                return;
+            }
+            const filtered = allCustomers.filter(c => 
+                (c.name && c.name.toLowerCase().includes(query)) ||
+                (c.phone && c.phone.toLowerCase().includes(query)) ||
+                (c.email && c.email.toLowerCase().includes(query)) ||
+                (c.address && c.address.toLowerCase().includes(query))
+            );
+            renderCustomers(filtered);
+        }
+
+        async function viewCustomerSetup(customerId) {
+            const customer = allCustomers.find(c => c._id === customerId);
+            if (!customer) return;
+
+            const modal = document.getElementById("customerDetailModal");
+            const title = document.getElementById("modalCustomerName");
+            const content = document.getElementById("modalCustomerContent");
+
+            title.textContent = `${customer.name} — Profile & Installed Systems`;
+            content.innerHTML = `<p style="padding:20px; text-align:center;">Loading customer records from database...</p>`;
+            modal.style.display = "flex";
+
+            try {
+                // Fetch customer's CCTV records and service requests
+                const [cctvRes, reqRes] = await Promise.all([
+                    fetch(`${API_BASE_URL}/cctv/customer/${customer._id}`).then(r => r.json()),
+                    fetch(`${API_BASE_URL}/service-requests/customer/${customer._id}`).then(r => r.json())
+                ]);
+
+                const cctvs = cctvRes.cctvs || [];
+                const requests = reqRes.requests || [];
+
+                content.innerHTML = `
+                    <div style="margin-bottom: 20px; background: #F8FAFC; padding: 14px; border-radius: 10px;">
+                        <p><strong>Phone:</strong> ${escapeHTML(customer.phone)}</p>
+                        <p><strong>Email:</strong> ${escapeHTML(customer.email)}</p>
+                        <p><strong>Premises Address:</strong> ${escapeHTML(customer.address)}</p>
+                    </div>
+
+                    <h4 style="color: #2D5A5C; margin: 16px 0 8px;">Installed CCTV Systems (${cctvs.length})</h4>
+                    ${cctvs.length === 0 ? '<p style="color:#64748B; font-size:13px;">No CCTV hardware registered yet.</p>' : `
+                        <ul style="list-style: inside disc; font-size: 14px; color: #334155;">
+                            ${cctvs.map(c => `<li><strong>${escapeHTML(c.brand)} ${escapeHTML(c.model)}:</strong> ${c.quantity} cameras (${c.type}) at ${escapeHTML(c.location || "Premises")}</li>`).join("")}
+                        </ul>
+                    `}
+
+                    <h4 style="color: #2D5A5C; margin: 18px 0 8px;">Service Requests (${requests.length})</h4>
+                    ${requests.length === 0 ? '<p style="color:#64748B; font-size:13px;">No service requests logged.</p>' : `
+                        <div style="display:flex; flex-direction:column; gap:8px;">
+                            ${requests.map(r => `
+                                <div style="border: 1px solid #E2E8F0; padding: 10px; border-radius: 8px;">
+                                    <strong>#${escapeHTML(r.requestNumber || r._id.substring(0,8))} - ${escapeHTML(r.serviceType)}</strong>
+                                    <span class="status ${r.status === 'Completed' ? 'bill-paid' : 'bill-pending'}" style="margin-left: 8px;">${r.status}</span>
+                                    <p style="font-size: 12px; color: #64748B; margin-top: 4px;">Slot: ${formatDate(r.preferredDate)} | Issue: ${escapeHTML(r.description || "-")}</p>
+                                </div>
+                            `).join("")}
+                        </div>
+                    `}
+                `;
+            } catch (e) {
+                content.innerHTML = `<p style="color:#DC2626;">Error fetching details: ${e.message}</p>`;
+            }
+        }
+
+        function closeCustomerModal() {
+            document.getElementById("customerDetailModal").style.display = "none";
+        }
+
+        async function deleteCustomer(id) {
+            if (!confirm("Are you sure you want to delete this customer record?")) return;
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/customers/${id}`, { method: "DELETE" });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || "Delete failed");
+                alert("Customer deleted successfully.");
+                loadCustomers();
+            } catch (err) {
+                alert("Delete error: " + err.message);
+            }
+        }
+
+        loadCustomers();
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProTech Solutions - Manage Service Requests</title>
+    <link rel="stylesheet" href="C-CSS.css">
+    <link rel="icon" type="image/svg+xml" href="images/protech-logo.svg">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="dashboard-header">
+
+        <div class="brand-wrapper">
+            <img src="images/protech-logo.svg" alt="ProTech Solutions" class="brand-logo-img">
+
+            <div class="company-info">
+                <h2>ProTech Solutions</h2>
+                <p>Staff &amp; Admin Panel</p>
+            </div>
+        </div>
+
+        <div class="staff-header-right">
+
+            <span id="staffRoleDisplay">Staff</span>
+
+            <a href="S_Dashboard.html" class="nav-link">
+                <button type="button" class="dashboard-btn">
+                    Staff Dashboard
+                </button>
+            </a>
+
+            <button type="button" class="logout-btn" onclick="staffLogout()">
+                Logout
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <section class="welcome">
+
+        <h1>Service Requests Management</h1>
+
+        <p>
+            Review customer service bookings, assign technicians,
+            and update dispatch status.
+        </p>
+
+    </section>
+
+
+    <!-- Search -->
+
+    <div class="request-search">
+
+        <input
+            type="text"
+            id="manageRequestSearch"
+            placeholder="Search by Request #, customer name, phone, or service type..."
+            onkeyup="filterRequestsList()"
+        >
+
+        <button type="button" onclick="filterRequestsList()">
+            Search
+        </button>
+
+    </div>
+
+
+    <!-- Requests Table -->
+
+    <div class="request-list">
+
+        <h2>
+            Active &amp; Historic Service Requests
+            (<span id="requestCount">0</span>)
+        </h2>
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Date</th>
+                        <th>Request #</th>
+                        <th>Customer</th>
+                        <th>Service Type</th>
+                        <th>Preferred Slot</th>
+                        <th>Current Status</th>
+                        <th>Action</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="staffRequestsTableBody">
+
+                    <tr>
+                        <td colspan="7" style="text-align: center;">
+                            Loading service requests...
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- Status Update Modal -->
+
+    <div
+        id="requestModal"
+        style="
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        "
+    >
+
+        <div
+            style="
+                background: #FFFFFF;
+                border-radius: 16px;
+                padding: 28px;
+                width: 90%;
+                max-width: 600px;
+                max-height: 85vh;
+                overflow-y: auto;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            "
+        >
+
+            <div
+                style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    border-bottom: 2px solid #F1F5F9;
+                    padding-bottom: 12px;
+                    margin-bottom: 16px;
+                "
+            >
+
+                <h3
+                    id="modalReqTitle"
+                    style="
+                        color: #2D5A5C;
+                        font-size: 20px;
+                        font-weight: 800;
+                    "
+                >
+                    Manage Service Request
+                </h3>
+
+                <button
+                    type="button"
+                    onclick="closeReqModal()"
+                    style="
+                        background: none;
+                        border: none;
+                        font-size: 24px;
+                        cursor: pointer;
+                        color: #64748B;
+                    "
+                >
+                    ✕
+                </button>
+
+            </div>
+
+
+            <div id="modalReqContent" style="margin-bottom: 20px;">
+            </div>
+
+
+            <form id="updateStatusForm">
+
+                <input type="hidden" id="modalReqId">
+
+
+                <div class="form-group">
+
+                    <label for="newReqStatus">
+                        Update Dispatch Status
+                    </label>
+
+                    <select id="newReqStatus" required>
+
+                        <option value="Pending">
+                            Pending
+                        </option>
+
+                        <option value="Confirmed">
+                            Confirmed (Technician Scheduled)
+                        </option>
+
+                        <option value="In Progress">
+                            In Progress (Technician on Site)
+                        </option>
+
+                        <option value="Completed">
+                            Completed (Service Done)
+                        </option>
+
+                        <option value="Cancelled">
+                            Cancelled
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="technicianNotes">
+                        Technician Inspection &amp; Resolution Notes
+                    </label>
+
+                    <textarea
+                        id="technicianNotes"
+                        placeholder="Enter findings, parts replaced, or visit details..."
+                        rows="3"
+                    ></textarea>
+
+                </div>
+
+
+                <div
+                    style="
+                        display: flex;
+                        gap: 12px;
+                        margin-top: 14px;
+                    "
+                >
+
+                    <button
+                        type="submit"
+                        class="submit-btn"
+                        style="flex: 2;"
+                    >
+                        Save Status &amp; Notes
+                    </button>
+
+                    <button
+                        type="button"
+                        class="remove-cart-btn"
+                        style="flex: 1;"
+                        onclick="closeReqModal()"
+                    >
+                        Close
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <script src="C-JS.js"></script>
+
+
+    <script>
+
+        let serviceRequests = [];
+
+
+        async function loadStaffRequests() {
+
+            const tbody =
+                document.getElementById(
+                    "staffRequestsTableBody"
+                );
+
+            try {
+
+                const response =
+                    await fetch(
+                        `${API_BASE_URL}/service-requests`
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        result.message ||
+                        "Failed to load requests."
+                    );
+
+                }
+
+
+                /*
+                 * IMPORTANT:
+                 * Backend returns "serviceRequests"
+                 * not "requests".
+                 */
+
+                serviceRequests =
+                    result.serviceRequests || [];
+
+
+                document.getElementById(
+                    "requestCount"
+                ).textContent =
+                    serviceRequests.length;
+
+
+                renderRequestsTable(
+                    serviceRequests
+                );
+
+
+            } catch (err) {
+
+                console.error(
+                    "Requests load error:",
+                    err
+                );
+
+                tbody.innerHTML =
+                    `<tr>
+                        <td
+                            colspan="7"
+                            style="
+                                text-align:center;
+                                color:#DC2626;
+                            "
+                        >
+                            Error: ${err.message}
+                        </td>
+                    </tr>`;
+
+            }
+
+        }
+
+
+        function renderRequestsTable(requests) {
+
+            const tbody =
+                document.getElementById(
+                    "staffRequestsTableBody"
+                );
+
+
+            if (requests.length === 0) {
+
+                tbody.innerHTML =
+                    `<tr>
+                        <td
+                            colspan="7"
+                            style="
+                                text-align:center;
+                                padding:24px;
+                                color:#64748B;
+                            "
+                        >
+                            No service requests logged yet.
+                        </td>
+                    </tr>`;
+
+                return;
+
+            }
+
+
+            tbody.innerHTML =
+                requests.map(req => {
+
+                    const date =
+                        formatDate(
+                            req.createdAt
+                        );
+
+
+                    const custName =
+                        req.customerName ||
+                        (
+                            req.customerId &&
+                            req.customerId.name
+                        ) ||
+                        "Valued Customer";
+
+
+                    const custPhone =
+                        req.mobile ||
+                        (
+                            req.customerId &&
+                            req.customerId.phone
+                        ) ||
+                        "";
+
+
+                    const statusBadge =
+                        getStatusBadge(
+                            req.status
+                        );
+
+
+                    return `
+                        <tr>
+
+                            <td>
+                                ${date}
+                            </td>
+
+                            <td>
+                                <strong>
+                                    #${escapeHTML(
+                                        req.requestId || "-"
+                                    )}
+                                </strong>
+                            </td>
+
+                            <td>
+
+                                <strong>
+                                    ${escapeHTML(
+                                        custName
+                                    )}
+                                </strong>
+
+                                ${
+                                    custPhone
+                                    ?
+                                    `<br>
+                                    <small
+                                        style="
+                                            color:#64748B;
+                                        "
+                                    >
+                                        ${escapeHTML(
+                                            custPhone
+                                        )}
+                                    </small>`
+                                    :
+                                    ""
+                                }
+
+                            </td>
+
+                            <td>
+                                ${escapeHTML(
+                                    req.serviceType || "-"
+                                )}
+                            </td>
+
+                            <td>
+
+                                ${escapeHTML(
+                                    req.serviceDate || "-"
+                                )}
+
+                                <br>
+
+                                <small
+                                    style="
+                                        color:#64748B;
+                                    "
+                                >
+                                    ${escapeHTML(
+                                        req.serviceTime || "-"
+                                    )}
+                                </small>
+
+                            </td>
+
+                            <td>
+
+                                <span
+                                    class="request-status ${statusBadge}"
+                                >
+                                    ●
+                                    ${escapeHTML(
+                                        req.status || "Pending"
+                                    )}
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                <button
+                                    type="button"
+                                    onclick="openReqModal('${req._id}')"
+                                >
+                                    Update Status
+                                </button>
+
+                            </td>
+
+                        </tr>
+                    `;
+
+                }).join("");
+
+        }
+
+
+        function getStatusBadge(status) {
+
+            const s =
+                (status || "").toLowerCase();
+
+
+            if (s === "completed") {
+                return "paid-status";
+            }
+
+
+            if (
+                s === "in progress" ||
+                s === "confirmed"
+            ) {
+                return "progress-status";
+            }
+
+
+            if (s === "cancelled") {
+                return "cancelled-status";
+            }
+
+
+            return "bill-pending";
+
+        }
+
+
+        function filterRequestsList() {
+
+            const query =
+                document
+                    .getElementById(
+                        "manageRequestSearch"
+                    )
+                    .value
+                    .toLowerCase()
+                    .trim();
+
+
+            if (!query) {
+
+                renderRequestsTable(
+                    serviceRequests
+                );
+
+                return;
+
+            }
+
+
+            const filtered =
+                serviceRequests.filter(r => {
+
+                    const num =
+                        r.requestId || "";
+
+                    const type =
+                        r.serviceType || "";
+
+                    const stat =
+                        r.status || "";
+
+                    const name =
+                        r.customerName ||
+                        (
+                            r.customerId &&
+                            r.customerId.name
+                        ) ||
+                        "";
+
+                    const phone =
+                        r.mobile ||
+                        (
+                            r.customerId &&
+                            r.customerId.phone
+                        ) ||
+                        "";
+
+
+                    return (
+
+                        num
+                            .toLowerCase()
+                            .includes(query)
+
+                        ||
+
+                        type
+                            .toLowerCase()
+                            .includes(query)
+
+                        ||
+
+                        stat
+                            .toLowerCase()
+                            .includes(query)
+
+                        ||
+
+                        name
+                            .toLowerCase()
+                            .includes(query)
+
+                        ||
+
+                        phone
+                            .includes(query)
+
+                    );
+
+                });
+
+
+            renderRequestsTable(
+                filtered
+            );
+
+        }
+
+
+        function openReqModal(reqId) {
+
+            const req =
+                serviceRequests.find(
+                    r => r._id === reqId
+                );
+
+
+            if (!req) {
+                return;
+            }
+
+
+            const modal =
+                document.getElementById(
+                    "requestModal"
+                );
+
+
+            const title =
+                document.getElementById(
+                    "modalReqTitle"
+                );
+
+
+            const content =
+                document.getElementById(
+                    "modalReqContent"
+                );
+
+
+            document.getElementById(
+                "modalReqId"
+            ).value =
+                req._id;
+
+
+            document.getElementById(
+                "newReqStatus"
+            ).value =
+                req.status || "Pending";
+
+
+            document.getElementById(
+                "technicianNotes"
+            ).value =
+                req.technicianNotes || "";
+
+
+            const custName =
+                req.customerName ||
+                (
+                    req.customerId &&
+                    req.customerId.name
+                ) ||
+                "Customer";
+
+
+            const custPhone =
+                req.mobile ||
+                (
+                    req.customerId &&
+                    req.customerId.phone
+                ) ||
+                "-";
+
+
+            const custEmail =
+                (
+                    req.customerId &&
+                    req.customerId.email
+                ) ||
+                "-";
+
+
+            title.textContent =
+                `Request #${
+                    req.requestId || "-"
+                } — Details`;
+
+
+            content.innerHTML = `
+
+                <div
+                    style="
+                        background:#F8FAFC;
+                        padding:14px;
+                        border-radius:10px;
+                        font-size:14px;
+                    "
+                >
+
+                    <p>
+                        <strong>Customer:</strong>
+                        ${escapeHTML(custName)}
+                        |
+                        <strong>Phone:</strong>
+                        ${escapeHTML(custPhone)}
+                    </p>
+
+                    <p>
+                        <strong>Email:</strong>
+                        ${escapeHTML(custEmail)}
+                    </p>
+
+                    <p>
+                        <strong>Premises Visit Address:</strong>
+                        ${escapeHTML(
+                            req.serviceLocation || "-"
+                        )}
+                    </p>
+
+                    <p>
+                        <strong>Service Type:</strong>
+                        ${escapeHTML(
+                            req.serviceType || "-"
+                        )}
+                    </p>
+
+                    <p>
+                        <strong>Client Description:</strong>
+                        ${escapeHTML(
+                            req.problemDescription || "-"
+                        )}
+                    </p>
+
+                    <p>
+                        <strong>Preferred Date:</strong>
+                        ${escapeHTML(
+                            req.serviceDate || "-"
+                        )}
+                    </p>
+
+                    <p>
+                        <strong>Preferred Time:</strong>
+                        ${escapeHTML(
+                            req.serviceTime || "-"
+                        )}
+                    </p>
+
+                </div>
+
+            `;
+
+
+            modal.style.display =
+                "flex";
+
+        }
+
+
+        function closeReqModal() {
+
+            document.getElementById(
+                "requestModal"
+            ).style.display =
+                "none";
+
+        }
+
+
+        document
+            .getElementById(
+                "updateStatusForm"
+            )
+            .addEventListener(
+                "submit",
+                async function(e) {
+
+                    e.preventDefault();
+
+
+                    const reqId =
+                        document.getElementById(
+                            "modalReqId"
+                        ).value;
+
+
+                    const status =
+                        document.getElementById(
+                            "newReqStatus"
+                        ).value;
+
+
+                    const technicianNotes =
+                        document.getElementById(
+                            "technicianNotes"
+                        ).value
+                        .trim();
+
+
+                    try {
+
+                        const response =
+                            await fetch(
+                                `${API_BASE_URL}/service-requests/${reqId}/status`,
+                                {
+                                    method: "PUT",
+
+                                    headers: {
+                                        "Content-Type":
+                                            "application/json"
+                                    },
+
+                                    body:
+                                        JSON.stringify({
+                                            status,
+                                            technicianNotes
+                                        })
+                                }
+                            );
+
+
+                        const result =
+                            await response.json();
+
+
+                        if (!response.ok) {
+
+                            throw new Error(
+                                result.message ||
+                                "Failed to update status."
+                            );
+
+                        }
+
+
+                        alert(
+                            "Service request status updated successfully!"
+                        );
+
+
+                        closeReqModal();
+
+                        loadStaffRequests();
+
+
+                    } catch (err) {
+
+                        console.error(
+                            "Status update error:",
+                            err
+                        );
+
+                        alert(
+                            "Error: " +
+                            err.message
+                        );
+
+                    }
+
+                }
+            );
+
+
+        loadStaffRequests();
+
+    </script>
+
+</body>
+
+</html>

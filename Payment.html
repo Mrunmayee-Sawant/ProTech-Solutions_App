@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ProTech Solutions - Payment Checkout</title>
+
+    <link rel="stylesheet" href="C-CSS.css">
+    <link rel="icon" type="image/svg+xml" href="images/protech-logo.svg">
+</head>
+
+<body>
+
+    <header class="dashboard-header">
+
+        <div class="brand-wrapper">
+
+            <img
+                src="images/protech-logo.svg"
+                alt="ProTech Solutions"
+                class="brand-logo-img"
+            >
+
+            <div class="company-info">
+                <h2>ProTech Solutions</h2>
+                <p>CCTV Service &amp; Sales</p>
+            </div>
+
+        </div>
+
+        <div class="header-actions">
+
+            <a href="Bill-Page.html" class="nav-link">
+                <button type="button" class="logout-btn">
+                    My Bills
+                </button>
+            </a>
+
+            <a href="Dashboard.html" class="nav-link">
+                <button type="button" class="logout-btn">
+                    Dashboard
+                </button>
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <section class="welcome">
+
+        <h1>Secure Payment Portal</h1>
+
+        <p>
+            Complete your payment securely for CCTV equipment or service visits.
+        </p>
+
+    </section>
+
+
+    <div class="payment-container">
+
+        <div class="details-card" id="paymentDetailsCard">
+
+            <h3>Payment Details</h3>
+
+            <p>
+                <strong>Payment For:</strong>
+                <span id="paymentPurpose">
+                    CCTV Purchase / Service
+                </span>
+            </p>
+
+            <p>
+                <strong>Reference ID:</strong>
+                <span id="paymentRefId">-</span>
+            </p>
+
+            <p>
+                <strong>Customer Name:</strong>
+                <span id="paymentCustomerName">-</span>
+            </p>
+
+            <p
+                style="
+                    font-size: 20px;
+                    font-weight: 800;
+                    color: #2D5A5C;
+                    margin-top: 12px;
+                "
+            >
+                <strong>Amount to Pay:</strong>
+                ₹<span id="paymentAmountDisplay">0</span>
+            </p>
+
+        </div>
+
+
+        <form
+            id="paymentForm"
+            style="margin-top: 24px;"
+        >
+
+            <div class="form-group">
+
+                <label for="paymentMethod">
+                    Select Payment Method
+                </label>
+
+                <select id="paymentMethod" required>
+
+                    <option value="UPI">
+                        UPI (Google Pay / PhonePe / Paytm / BHIM)
+                    </option>
+
+                    <option value="Card">
+                        Debit / Credit Card (Visa / MasterCard / RuPay)
+                    </option>
+
+                    <option value="NetBanking">
+                        Net Banking
+                    </option>
+
+                    <option value="Cash">
+                        Cash on Delivery / Post-Service Cash
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div
+                id="upiFields"
+                class="form-group"
+            >
+
+                <label for="upiId">
+                    Enter UPI Virtual Payment Address (VPA)
+                </label>
+
+                <input
+                    type="text"
+                    id="upiId"
+                    placeholder="e.g. mobileNumber@upi or name@okhdfcbank"
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <div
+                id="cardFields"
+                style="
+                    display: none;
+                    flex-direction: column;
+                    gap: 14px;
+                    width: 100%;
+                "
+            >
+
+                <div class="form-group">
+
+                    <label for="cardNumber">
+                        Card Number (16 Digits)
+                    </label>
+
+                    <input
+                        type="text"
+                        id="cardNumber"
+                        placeholder="4532 1234 5678 9010"
+                        maxlength="19"
+                        inputmode="numeric"
+                        autocomplete="off"
+                    >
+
+                </div>
+
+
+                <div
+                    style="
+                        display: flex;
+                        gap: 14px;
+                    "
+                >
+
+                    <div
+                        class="form-group"
+                        style="flex: 1;"
+                    >
+
+                        <label for="cardExpiry">
+                            Expiry (MM/YY)
+                        </label>
+
+                        <input
+                            type="text"
+                            id="cardExpiry"
+                            placeholder="MM/YY"
+                            maxlength="5"
+                            inputmode="numeric"
+                            autocomplete="off"
+                        >
+
+                    </div>
+
+
+                    <div
+                        class="form-group"
+                        style="flex: 1;"
+                    >
+
+                        <label for="cardCvv">
+                            CVV (3 Digits)
+                        </label>
+
+                        <input
+                            type="password"
+                            id="cardCvv"
+                            placeholder="123"
+                            maxlength="3"
+                            inputmode="numeric"
+                            autocomplete="off"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="netBankingFields"
+                class="form-group"
+                style="display: none;"
+            >
+
+                <label for="bankSelect">
+                    Select Bank
+                </label>
+
+                <select id="bankSelect">
+
+                    <option value="HDFC Bank">
+                        HDFC Bank
+                    </option>
+
+                    <option value="State Bank of India">
+                        State Bank of India
+                    </option>
+
+                    <option value="ICICI Bank">
+                        ICICI Bank
+                    </option>
+
+                    <option value="Axis Bank">
+                        Axis Bank
+                    </option>
+
+                    <option value="Kotak Mahindra Bank">
+                        Kotak Mahindra Bank
+                    </option>
+
+                    <option value="Punjab National Bank">
+                        Punjab National Bank
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div
+                id="cashFields"
+                class="form-group"
+                style="display: none;"
+            >
+
+                <div
+                    style="
+                        padding: 14px;
+                        border-radius: 8px;
+                        background: #f1f5f9;
+                        border: 1px solid #cbd5e1;
+                    "
+                >
+
+                    <strong>Cash Payment</strong>
+
+                    <p
+                        style="
+                            margin: 6px 0 0;
+                            color: #475569;
+                        "
+                    >
+                        Your payment will be collected during
+                        delivery or after the service visit.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="confirm-payment-btn"
+                id="paySubmitBtn"
+            >
+                Confirm &amp; Pay ₹<span id="payBtnAmount">0</span>
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <script src="C-JS.js"></script>
+
+
+    <script>
+
+        let currentAmount = 0;
+
+        let activeOrderId = null;
+
+        let activeBillId = null;
+
+        let activeReferenceId = null;
+
+
+        function formatPaymentAmount(amount) {
+
+            return Number(amount || 0)
+                .toLocaleString("en-IN");
+
+        }
+
+
+        function getPaymentCustomer() {
+
+            try {
+
+                const storedCustomer =
+                    localStorage.getItem(
+                        "loggedInCustomer"
+                    );
+
+                if (!storedCustomer) {
+                    return null;
+                }
+
+                const customer =
+                    JSON.parse(storedCustomer);
+
+                if (
+                    customer &&
+                    customer._id
+                ) {
+                    return customer;
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "PAYMENT CUSTOMER ERROR:",
+                    error
+                );
+
+            }
+
+            return null;
+
+        }
+
+
+        function showAmount() {
+
+            document.getElementById(
+                "paymentAmountDisplay"
+            ).textContent =
+                formatPaymentAmount(
+                    currentAmount
+                );
+
+            document.getElementById(
+                "payBtnAmount"
+            ).textContent =
+                formatPaymentAmount(
+                    currentAmount
+                );
+
+        }
+
+
+        function initPaymentPage() {
+
+            const customer =
+                getPaymentCustomer();
+
+
+            if (customer) {
+
+                document.getElementById(
+                    "paymentCustomerName"
+                ).textContent =
+                    customer.name ||
+                    "Valued Customer";
+
+            } else {
+
+                document.getElementById(
+                    "paymentCustomerName"
+                ).textContent =
+                    "Guest";
+
+            }
+
+
+            const pendingOrderStr =
+                localStorage.getItem(
+                    "pendingPaymentOrder"
+                );
+
+
+            const pendingBillStr =
+                localStorage.getItem(
+                    "pendingBillPayment"
+                );
+
+
+            /* =================================================
+               PRODUCT ORDER PAYMENT
+            ================================================= */
+
+            if (pendingOrderStr) {
+
+                try {
+
+                    const orderData =
+                        JSON.parse(
+                            pendingOrderStr
+                        );
+
+
+                    activeOrderId =
+                        orderData.orderId ||
+                        orderData._id ||
+                        orderData.id ||
+                        null;
+
+
+                    currentAmount =
+                        Number(
+                            orderData.amount ||
+                            orderData.totalAmount ||
+                            orderData.total ||
+                            0
+                        );
+
+
+                    /*
+                     * Product payment does NOT have a bill yet.
+                     * Therefore activeBillId remains null.
+                     */
+
+                    activeBillId = null;
+
+
+                    activeReferenceId =
+                        orderData.orderNumber ||
+                        activeOrderId ||
+                        null;
+
+
+                    document.getElementById(
+                        "paymentPurpose"
+                    ).textContent =
+                        "CCTV Product Purchase Order";
+
+
+                    document.getElementById(
+                        "paymentRefId"
+                    ).textContent =
+                        activeReferenceId ||
+                        "-";
+
+
+                    showAmount();
+
+
+                    console.log(
+                        "PRODUCT PAYMENT:",
+                        {
+                            orderId: activeOrderId,
+                            amount: currentAmount
+                        }
+                    );
+
+
+                    return;
+
+                } catch (error) {
+
+                    console.error(
+                        "ERROR READING ORDER:",
+                        error
+                    );
+
+                }
+
+            }
+
+
+            /* =================================================
+               BILL PAYMENT
+            ================================================= */
+
+            if (pendingBillStr) {
+
+                try {
+
+                    const billData =
+                        JSON.parse(
+                            pendingBillStr
+                        );
+
+
+                    activeBillId =
+                        billData.billId ||
+                        billData._id ||
+                        billData.id ||
+                        billData.billNumber ||
+                        null;
+
+
+                    activeOrderId =
+                        null;
+
+
+                    currentAmount =
+                        Number(
+                            billData.amount ||
+                            billData.totalAmount ||
+                            billData.balanceAmount ||
+                            0
+                        );
+
+
+                    activeReferenceId =
+                        billData.billNumber ||
+                        billData.billId ||
+                        billData._id ||
+                        null;
+
+
+                    document.getElementById(
+                        "paymentPurpose"
+                    ).textContent =
+                        "CCTV Installation / Service Invoice";
+
+
+                    document.getElementById(
+                        "paymentRefId"
+                    ).textContent =
+                        activeReferenceId ||
+                        "-";
+
+
+                    showAmount();
+
+
+                    console.log(
+                        "BILL PAYMENT:",
+                        {
+                            billId: activeBillId,
+                            amount: currentAmount
+                        }
+                    );
+
+
+                    return;
+
+                } catch (error) {
+
+                    console.error(
+                        "ERROR READING BILL:",
+                        error
+                    );
+
+                }
+
+            }
+
+
+            /*
+             * Do not create a fake payment amount.
+             */
+
+            currentAmount = 0;
+
+            activeOrderId = null;
+
+            activeBillId = null;
+
+            activeReferenceId = null;
+
+
+            document.getElementById(
+                "paymentPurpose"
+            ).textContent =
+                "No Payment Selected";
+
+
+            document.getElementById(
+                "paymentRefId"
+            ).textContent =
+                "-";
+
+
+            showAmount();
+
+        }
+
+
+        function togglePaymentFields() {
+
+            const method =
+                document.getElementById(
+                    "paymentMethod"
+                ).value;
+
+
+            document.getElementById(
+                "upiFields"
+            ).style.display =
+                method === "UPI"
+                    ? "flex"
+                    : "none";
+
+
+            document.getElementById(
+                "cardFields"
+            ).style.display =
+                method === "Card"
+                    ? "flex"
+                    : "none";
+
+
+            document.getElementById(
+                "netBankingFields"
+            ).style.display =
+                method === "NetBanking"
+                    ? "block"
+                    : "none";
+
+
+            document.getElementById(
+                "cashFields"
+            ).style.display =
+                method === "Cash"
+                    ? "block"
+                    : "none";
+
+        }
+
+
+        document
+            .getElementById("paymentMethod")
+            .addEventListener(
+                "change",
+                togglePaymentFields
+            );
+
+
+        document
+            .getElementById("cardNumber")
+            .addEventListener(
+                "input",
+                function () {
+
+                    let value =
+                        this.value
+                            .replace(/\D/g, "")
+                            .substring(0, 16);
+
+
+                    let formatted = "";
+
+
+                    for (
+                        let i = 0;
+                        i < value.length;
+                        i++
+                    ) {
+
+                        if (
+                            i > 0 &&
+                            i % 4 === 0
+                        ) {
+
+                            formatted += " ";
+
+                        }
+
+                        formatted += value[i];
+
+                    }
+
+
+                    this.value =
+                        formatted;
+
+                }
+            );
+
+
+        document
+            .getElementById("cardExpiry")
+            .addEventListener(
+                "input",
+                function () {
+
+                    let value =
+                        this.value
+                            .replace(/\D/g, "")
+                            .substring(0, 4);
+
+
+                    if (
+                        value.length > 2
+                    ) {
+
+                        value =
+                            value.substring(0, 2) +
+                            "/" +
+                            value.substring(2);
+
+                    }
+
+
+                    this.value =
+                        value;
+
+                }
+            );
+
+
+        document
+            .getElementById("cardCvv")
+            .addEventListener(
+                "input",
+                function () {
+
+                    this.value =
+                        this.value
+                            .replace(/\D/g, "")
+                            .substring(0, 3);
+
+                }
+            );
+
+
+        document
+            .getElementById("paymentForm")
+            .addEventListener(
+                "submit",
+                async function (e) {
+
+                    e.preventDefault();
+
+
+                    const customer =
+                        getPaymentCustomer();
+
+
+                    if (
+                        !customer ||
+                        !customer._id
+                    ) {
+
+                        alert(
+                            "Please login first."
+                        );
+
+                        window.location.href =
+                            "Login.html";
+
+                        return;
+
+                    }
+
+
+                    if (
+                        !currentAmount ||
+                        Number(currentAmount) <= 0
+                    ) {
+
+                        alert(
+                            "No valid payment amount was selected."
+                        );
+
+                        return;
+
+                    }
+
+
+                    /*
+                     * We need either:
+                     * 1. orderId for a product payment
+                     * OR
+                     * 2. billId for a bill payment
+                     */
+
+                    if (
+                        !activeOrderId &&
+                        !activeBillId
+                    ) {
+
+                        alert(
+                            "Payment reference is missing. Please go back and start the payment again."
+                        );
+
+                        return;
+
+                    }
+
+
+                    const customerId =
+                        String(
+                            customer._id
+                        ).trim();
+
+
+                    const method =
+                        document.getElementById(
+                            "paymentMethod"
+                        ).value;
+
+
+                    let reference = "";
+
+
+                    /* =================================================
+                       UPI
+                    ================================================= */
+
+                    if (
+                        method === "UPI"
+                    ) {
+
+                        const upi =
+                            document.getElementById(
+                                "upiId"
+                            ).value.trim();
+
+
+                        if (
+                            !upi ||
+                            !upi.includes("@")
+                        ) {
+
+                            alert(
+                                "Please enter a valid UPI ID."
+                            );
+
+                            return;
+
+                        }
+
+
+                        reference = upi;
+
+                    }
+
+
+                    /* =================================================
+                       CARD
+                    ================================================= */
+
+                    else if (
+                        method === "Card"
+                    ) {
+
+                        const cardNumber =
+                            document.getElementById(
+                                "cardNumber"
+                            ).value
+                            .replace(/\s/g, "");
+
+
+                        const expiry =
+                            document.getElementById(
+                                "cardExpiry"
+                            ).value.trim();
+
+
+                        const cvv =
+                            document.getElementById(
+                                "cardCvv"
+                            ).value.trim();
+
+
+                        if (
+                            cardNumber.length !== 16
+                        ) {
+
+                            alert(
+                                "Please enter a valid 16-digit card number."
+                            );
+
+                            return;
+
+                        }
+
+
+                       if (!/^\d{2}\/\d{2}$/.test(expiry)) {
+
+    alert(
+        "Please enter card expiry in MM/YY format."
+    );
+
+    return;
+
+}
+
+const [month, year] = expiry.split("/").map(Number);
+
+const currentDate = new Date();
+const currentMonth = currentDate.getMonth() + 1;
+const currentYear = currentDate.getFullYear() % 100;
+
+if (month < 1 || month > 12) {
+
+    alert(
+        "Please enter a valid expiry month between 01 and 12."
+    );
+
+    return;
+
+}
+
+if (year < currentYear || (year === currentYear && month < currentMonth)) {
+
+    alert(
+        "Card expiry date has already expired."
+    );
+
+    return;
+
+}
+
+
+                        if (
+                            cvv.length !== 3
+                        ) {
+
+                            alert(
+                                "Please enter a valid 3-digit CVV."
+                            );
+
+                            return;
+
+                        }
+
+
+                        reference =
+                            "Card Payment";
+
+                    }
+
+
+                    /* =================================================
+                       NET BANKING
+                    ================================================= */
+
+                    else if (
+                        method === "NetBanking"
+                    ) {
+
+                        reference =
+                            document.getElementById(
+                                "bankSelect"
+                            ).value;
+
+                    }
+
+
+                    /* =================================================
+                       CASH
+                    ================================================= */
+
+                    else if (
+                        method === "Cash"
+                    ) {
+
+                        reference =
+                            "Cash Payment";
+
+                    }
+
+
+                    const submitBtn =
+                        document.getElementById(
+                            "paySubmitBtn"
+                        );
+
+
+                    submitBtn.disabled =
+                        true;
+
+
+                    submitBtn.textContent =
+                        "Processing Transaction...";
+
+
+                    /*
+                     * Create payment data.
+                     *
+                     * billId is sent ONLY for an actual bill.
+                     * orderId is sent ONLY for a product order.
+                     */
+
+                    const paymentData = {
+
+                        customerId:
+                            customerId,
+
+                        amount:
+                            Number(
+                                currentAmount
+                            ),
+
+                        method:
+                            method,
+
+                        date:
+                            new Date().toISOString(),
+
+                        reference:
+                            reference,
+
+                        status:
+                            method === "Cash"
+                                ? "Pending"
+                                : "Paid"
+
+                    };
+
+
+                    if (
+                        activeOrderId
+                    ) {
+
+                        paymentData.orderId =
+                            activeOrderId;
+
+                    }
+
+
+                    if (
+                        activeBillId
+                    ) {
+
+                        paymentData.billId =
+                            String(
+                                activeBillId
+                            ).trim();
+
+                    }
+
+
+                    console.log(
+                        "PAYMENT DATA SENT:",
+                        paymentData
+                    );
+
+
+                    try {
+
+                        const response =
+                            await fetch(
+                                `${API_BASE_URL}/payments`,
+                                {
+                                    method: "POST",
+
+                                    headers: {
+                                        "Content-Type":
+                                            "application/json"
+                                    },
+
+                                    body:
+                                        JSON.stringify(
+                                            paymentData
+                                        )
+                                }
+                            );
+
+
+                        const responseText =
+                            await response.text();
+
+
+                        console.log(
+                            "PAYMENT RESPONSE:",
+                            responseText
+                        );
+
+
+                        let result = {};
+
+
+                        try {
+
+                            result =
+                                responseText
+                                    ? JSON.parse(
+                                        responseText
+                                    )
+                                    : {};
+
+                        } catch (error) {
+
+                            result = {
+                                message:
+                                    responseText
+                            };
+
+                        }
+
+
+                        if (
+                            !response.ok
+                        ) {
+
+                            throw new Error(
+                                result.error ||
+                                result.message ||
+                                "Payment failed."
+                            );
+
+                        }
+
+
+                        const savedPayment =
+                            result.payment ||
+                            {};
+
+
+                        const transactionId =
+                            savedPayment._id ||
+                            activeReferenceId ||
+                            "PAYMENT-SUCCESS";
+
+
+                        const paidAmount =
+                            Number(
+                                savedPayment.amount ||
+                                currentAmount
+                            );
+
+
+                        const paymentStatus =
+                            savedPayment.status ||
+                            paymentData.status;
+
+
+                        localStorage.removeItem(
+                            "pendingPaymentOrder"
+                        );
+
+
+                        localStorage.removeItem(
+                            "pendingBillPayment"
+                        );
+
+
+                        if (
+                            paymentStatus ===
+                            "Pending"
+                        ) {
+
+                            alert(
+                                "Payment request recorded successfully!\n\n" +
+                                "Reference ID: " +
+                                transactionId +
+                                "\n" +
+                                "Amount: ₹" +
+                                formatPaymentAmount(
+                                    paidAmount
+                                ) +
+                                "\n" +
+                                "Status: Pending"
+                            );
+
+                        } else {
+
+                            alert(
+                                "Payment Successful!\n\n" +
+                                "Transaction ID: " +
+                                transactionId +
+                                "\n" +
+                                "Amount Paid: ₹" +
+                                formatPaymentAmount(
+                                    paidAmount
+                                ) +
+                                "\n" +
+                                "Status: " +
+                                paymentStatus
+                            );
+
+                        }
+
+
+                        window.location.href =
+                        "History.html?tab=payments";
+
+
+                    } catch (error) {
+
+                        console.error(
+                            "PAYMENT ERROR:",
+                            error
+                        );
+
+
+                        alert(
+                            "Payment error: " +
+                            (
+                                error.message ||
+                                "Unable to process payment."
+                            )
+                        );
+
+
+                        submitBtn.disabled =
+                            false;
+
+
+                        submitBtn.innerHTML =
+                            `Confirm &amp; Pay ₹${formatPaymentAmount(
+                                currentAmount
+                            )}`;
+
+                    }
+
+                }
+            );
+
+
+        initPaymentPage();
+
+        togglePaymentFields();
+
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProTech Solutions - Staff Registration</title>
+    <link rel="stylesheet" href="C-CSS.css">
+    <link rel="icon" type="image/svg+xml" href="images/protech-logo.svg">
+</head>
+
+<body>
+
+    <div class="register-container">
+
+        <a href="S_Login.html" style="text-decoration: none;">
+            <img src="images/protech-logo.svg" alt="ProTech Solutions Logo" class="login-logo">
+        </a>
+
+        <h1>Staff Registration</h1>
+        <p class="subtitle">Register an official staff or administrator account</p>
+
+        <form id="staffRegisterForm">
+
+            <div class="form-group">
+                <label for="staffRegName">Full Name</label>
+                <input
+                    type="text"
+                    id="staffRegName"
+                    placeholder="Enter technician / staff full name"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="staffRegUsername">Username</label>
+                <input
+                    type="text"
+                    id="staffRegUsername"
+                    placeholder="Choose a unique username"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="staffRegEmail">Official Email</label>
+                <input
+                    type="email"
+                    id="staffRegEmail"
+                    placeholder="staff@protech.com"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="staffRegPhone">Contact Mobile Number (10 Digits)</label>
+                <input
+                    type="tel"
+                    id="staffRegPhone"
+                    placeholder="e.g. 9876543210"
+                    pattern="[0-9]{10}"
+                    maxlength="10"
+                    title="Mobile number must be exactly 10 digits"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="staffRegRole">Designation / Role</label>
+                <select id="staffRegRole" required>
+                    <option value="">Select Role</option>
+                    <option value="Staff">Service Staff / Technician</option>
+                    <option value="Admin">Administrator</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="staffRegPassword">Password</label>
+                <input
+                    type="password"
+                    id="staffRegPassword"
+                    placeholder="Create a password (min. 6 characters)"
+                    minlength="6"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="staffRegConfirmPassword">Confirm Password</label>
+                <input
+                    type="password"
+                    id="staffRegConfirmPassword"
+                    placeholder="Confirm your password"
+                    minlength="6"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="submit-btn">Register Staff Account</button>
+
+        </form>
+
+        <p class="register">
+            Already registered?
+            <a href="S_Login.html">Login to Staff Panel</a>
+        </p>
+
+        <p class="back-login" style="margin-top: 10px; padding-top: 12px; border-top: 1px dashed #CBD5E1;">
+            Customer?
+            <a href="Login.html">Go to Customer Portal</a>
+        </p>
+
+    </div>
+
+    <script src="C-JS.js"></script>
+
+</body>
+
+</html>

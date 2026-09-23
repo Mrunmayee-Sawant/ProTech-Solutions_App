@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProTech Solutions - Confirm Payments</title>
+    <link rel="stylesheet" href="C-CSS.css">
+    <link rel="icon" type="image/svg+xml" href="images/protech-logo.svg">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="dashboard-header">
+
+        <div class="brand-wrapper">
+            <img src="images/protech-logo.svg" alt="ProTech Solutions" class="brand-logo-img">
+            <div class="company-info">
+                <h2>ProTech Solutions</h2>
+                <p>Staff &amp; Admin Panel</p>
+            </div>
+        </div>
+
+        <div class="staff-header-right">
+            <span id="staffRoleDisplay">Staff</span>
+            <a href="S_Dashboard.html" class="nav-link">
+                <button type="button" class="dashboard-btn">
+                    Staff Dashboard
+                </button>
+            </a>
+            <button type="button" class="logout-btn" onclick="staffLogout()">
+                Logout
+            </button>
+        </div>
+
+    </header>
+
+    <section class="welcome">
+        <h1>Payment Reconciliation &amp; Confirmation</h1>
+        <p>Record customer settlements, verify online transaction references, and manage payment logs.</p>
+    </section>
+
+    <!-- Payment Entry Form -->
+    <div class="payment-form">
+        <h2>Record Customer Payment</h2>
+
+        <form id="recordPaymentForm">
+
+            <div class="form-group">
+                <label for="payCustomerSelect">Select Customer</label>
+                <select id="payCustomerSelect" required>
+                    <option value="">Loading customers...</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+                <div class="form-group" style="flex: 1; min-width: 200px;">
+                    <label for="payAmount">Amount Received (₹ INR)</label>
+                    <input
+                        type="number"
+                        id="payAmount"
+                        placeholder="e.g. 14500"
+                        min="1"
+                        required
+                    >
+                </div>
+
+                <div class="form-group" style="flex: 1; min-width: 200px;">
+                    <label for="payMethodSelect">Payment Mode</label>
+                    <select id="payMethodSelect" required>
+                        <option value="Cash">Cash Handover / On-Site Collection</option>
+                        <option value="UPI">UPI (GPay / PhonePe / QR)</option>
+                        <option value="Card">Debit / Credit Card Swiped</option>
+                        <option value="NetBanking">Direct Bank Transfer / NEFT / IMPS</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="payTransactionId">UTR / Transaction / Reference ID</label>
+                <input
+                    type="text"
+                    id="payTransactionId"
+                    placeholder="e.g. UPI/1234567890 or CASH-REC-01"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="payRemarks">Payment Remarks / Bill Reference</label>
+                <input
+                    type="text"
+                    id="payRemarks"
+                    placeholder="e.g. Paid in full for Invoice #INV-102"
+                >
+            </div>
+
+            <button type="submit" class="confirm-payment-btn" id="recordPaymentBtn">
+                Verify &amp; Record Payment
+            </button>
+
+        </form>
+    </div>
+
+    <!-- Payments Ledger -->
+    <div class="payment-list">
+        <h2>Recorded Transaction Logs (<span id="ledgerCount">0</span>)</h2>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Transaction ID</th>
+                        <th>Customer</th>
+                        <th>Amount</th>
+                        <th>Mode</th>
+                        <th>Remarks</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="paymentLedgerBody">
+                    <tr>
+                        <td colspan="7" style="text-align: center;">Loading payment records...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="C-JS.js"></script>
+
+    <script>
+        async function initStaffPaymentPage() {
+            await loadCustomersForPayment();
+            await loadPaymentsLedger();
+        }
+
+        async function loadCustomersForPayment() {
+            const select = document.getElementById("payCustomerSelect");
+            try {
+                const res = await fetch(`${API_BASE_URL}/customers`);
+                const data = await res.json();
+                const list = data.customers || [];
+
+                if (list.length === 0) {
+                    select.innerHTML = `<option value="">No customers registered</option>`;
+                    return;
+                }
+
+                select.innerHTML = `<option value="">-- Select Customer --</option>` +
+                    list.map(c => `<option value="${c._id}">${escapeHTML(c.name)} (${escapeHTML(c.phone)})</option>`).join("");
+            } catch (e) {
+                select.innerHTML = `<option value="">Error loading customers</option>`;
+            }
+        }
+
+        document.getElementById("recordPaymentForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            const customerId = document.getElementById("payCustomerSelect").value;
+            const amount = Number(document.getElementById("payAmount").value || 0);
+            const paymentMethod = document.getElementById("payMethodSelect").value;
+            const transactionId = document.getElementById("payTransactionId").value.trim();
+            const remarks = document.getElementById("payRemarks").value.trim();
+
+            if (!customerId || amount <= 0 || !transactionId) {
+                alert("Please provide all required payment details.");
+                return;
+            }
+
+            const btn = document.getElementById("recordPaymentBtn");
+            btn.disabled = true;
+            btn.textContent = "Recording Payment...";
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/payments`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        customerId,
+                        amount,
+                        paymentMethod,
+                        transactionId,
+                        remarks,
+                        status: "Completed"
+                    })
+                });
+
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.message || "Failed to record payment.");
+                }
+
+                alert(`Payment of ₹${amount.toLocaleString("en-IN")} recorded successfully!\nRef: ${transactionId}`);
+                document.getElementById("recordPaymentForm").reset();
+                loadPaymentsLedger();
+            } catch (err) {
+                console.error("Payment record error:", err);
+                alert("Error: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "Verify & Record Payment";
+            }
+        });
+
+        async function loadPaymentsLedger() {
+            const tbody = document.getElementById("paymentLedgerBody");
+            try {
+                const response = await fetch(`${API_BASE_URL}/payments`);
+                const result = await response.json();
+
+                if (!response.ok) throw new Error(result.message || "Failed to load payments.");
+
+                const payments = result.payments || [];
+                document.getElementById("ledgerCount").textContent = payments.length;
+
+                if (payments.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 24px; color:#64748B;">No payments recorded yet.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = payments.map(p => {
+                    const custName = (p.customerId && p.customerId.name) ? p.customerId.name : "Customer";
+                    return `
+                        <tr>
+                            <td>${formatDate(p.paymentDate || p.createdAt)}</td>
+                            <td><code>${escapeHTML(p.transactionId || p._id)}</code></td>
+                            <td>${escapeHTML(custName)}</td>
+                            <td style="font-weight: 800; color: #2D5A5C;">₹${Number(p.amount || 0).toLocaleString("en-IN")}</td>
+                            <td>${escapeHTML(p.paymentMethod || "Online")}</td>
+                            <td>${escapeHTML(p.remarks || "-")}</td>
+                            <td><span class="paid-status">● ${escapeHTML(p.status || "Completed")}</span></td>
+                        </tr>
+                    `;
+                }).join("");
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#DC2626;">Error: ${err.message}</td></tr>`;
+            }
+        }
+
+        initStaffPaymentPage();
+    </script>
+
+</body>
+
+</html>

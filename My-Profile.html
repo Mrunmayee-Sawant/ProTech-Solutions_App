@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProTech Solutions - My Profile</title>
+    <link rel="stylesheet" href="C-CSS.css">
+    <link rel="icon" type="image/svg+xml" href="images/protech-logo.svg">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="dashboard-header">
+
+        <div class="brand-wrapper">
+            <img src="images/protech-logo.svg" alt="ProTech Solutions" class="brand-logo-img">
+            <div class="company-info">
+                <h2>ProTech Solutions</h2>
+                <p>CCTV Service &amp; Sales</p>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <a href="Dashboard.html" class="nav-link">
+                <button type="button" class="logout-btn">
+                    Dashboard
+                </button>
+            </a>
+
+            <button type="button" class="logout-btn" onclick="logout()">
+                Logout
+            </button>
+        </div>
+
+    </header>
+
+    <section class="welcome">
+        <h1>Customer Profile</h1>
+        <p>Manage your account settings, contact phone number, and service addresses.</p>
+    </section>
+
+    <div class="profile-container">
+
+        <div style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 24px;">
+            <div class="profile-icon">👤</div>
+            <h2 id="profileNameDisplay">Customer Name</h2>
+            <span class="profile-role">Registered Customer</span>
+        </div>
+
+        <div class="profile-details">
+            <div class="profile-item">
+                <strong>Account ID</strong>
+                <span id="profileIdDisplay">-</span>
+            </div>
+
+            <div class="profile-item">
+                <strong>Email Address</strong>
+                <span id="profileEmailDisplay">-</span>
+            </div>
+
+            <div class="profile-item">
+                <strong>Mobile Number</strong>
+                <span id="profilePhoneDisplay">-</span>
+            </div>
+
+            <div class="profile-item">
+                <strong>Registered Since</strong>
+                <span id="profileJoinedDisplay">-</span>
+            </div>
+
+            <div class="profile-item" style="grid-column: 1 / -1;">
+                <strong>Primary Installation Address</strong>
+                <span id="profileAddressDisplay">-</span>
+            </div>
+        </div>
+
+        <div class="profile-buttons">
+            <button type="button" class="edit-profile-btn" onclick="toggleEditProfile()">
+                ✏️ Edit Contact Information
+            </button>
+            
+            <a href="OrderHistory.html" class="order-history-btn">
+                📦 My Product Orders
+            </a>
+        </div>
+
+        <!-- Edit Profile Section -->
+        <div id="editProfileSection" style="display: none; margin-top: 32px; padding-top: 24px; border-top: 2px solid #F1F5F9;">
+            <h3 style="color: #2D5A5C; font-size: 20px; font-weight: 700; margin-bottom: 16px;">
+                Update Profile Information
+            </h3>
+
+            <form id="updateProfileForm">
+                <div class="form-group">
+                    <label for="editFullName">Full Name</label>
+                    <input type="text" id="editFullName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="editPhone">Contact Mobile (10 Digits)</label>
+                    <input
+                        type="tel"
+                        id="editPhone"
+                        pattern="[0-9]{10}"
+                        maxlength="10"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="editAddress">Installation Address</label>
+                    <textarea id="editAddress" rows="3" required></textarea>
+                </div>
+
+                <div style="display: flex; gap: 12px;">
+                    <button type="submit" class="submit-btn" style="flex: 2;">
+                        Save Changes
+                    </button>
+                    <button type="button" class="remove-cart-btn" style="flex: 1;" onclick="toggleEditProfile()">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+    <script src="C-JS.js"></script>
+
+    <script>
+        function renderProfile() {
+            const customer = getLoggedInCustomer();
+            if (!customer || !customer._id) return;
+
+            document.getElementById("profileNameDisplay").textContent = customer.name || "Customer";
+            document.getElementById("profileIdDisplay").textContent = customer._id;
+            document.getElementById("profileEmailDisplay").textContent = customer.email || "-";
+            document.getElementById("profilePhoneDisplay").textContent = customer.phone || "-";
+            document.getElementById("profileAddressDisplay").textContent = customer.address || "-";
+            document.getElementById("profileJoinedDisplay").textContent = formatDate(customer.createdAt || customer.date || new Date());
+
+            document.getElementById("editFullName").value = customer.name || "";
+            document.getElementById("editPhone").value = customer.phone || "";
+            document.getElementById("editAddress").value = customer.address || "";
+        }
+
+        function toggleEditProfile() {
+            const sec = document.getElementById("editProfileSection");
+            sec.style.display = sec.style.display === "none" ? "block" : "none";
+            if (sec.style.display === "block") {
+                sec.scrollIntoView({ behavior: "smooth" });
+            }
+        }
+
+        document.getElementById("updateProfileForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            const customer = getLoggedInCustomer();
+            if (!customer || !customer._id) return;
+
+            const name = document.getElementById("editFullName").value.trim();
+            const phone = document.getElementById("editPhone").value.trim();
+            const address = document.getElementById("editAddress").value.trim();
+
+            if (!/^\d{10}$/.test(phone)) {
+                alert("Mobile number must be exactly 10 digits.");
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/customers/${customer._id}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name, phone, address })
+                });
+
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.message || "Failed to update profile.");
+                }
+
+                // Update session
+                const updatedCustomer = { ...customer, name, phone, address };
+                localStorage.setItem("loggedInCustomer", JSON.stringify(updatedCustomer));
+
+                alert("Profile information updated successfully!");
+                toggleEditProfile();
+                renderProfile();
+            } catch (err) {
+                console.error("Profile update error:", err);
+                alert("Update error: " + err.message);
+            }
+        });
+
+        renderProfile();
+    </script>
+
+</body>
+
+</html>

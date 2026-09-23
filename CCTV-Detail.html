@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProTech Solutions - My CCTV Details</title>
+    <link rel="stylesheet" href="C-CSS.css">
+    <link rel="icon" type="image/svg+xml" href="images/protech-logo.svg">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="dashboard-header">
+
+        <div class="brand-wrapper">
+            <img src="images/protech-logo.svg" alt="ProTech Solutions" class="brand-logo-img">
+            <div class="company-info">
+                <h2>ProTech Solutions</h2>
+                <p>CCTV Service &amp; Sales</p>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <a href="Dashboard.html" class="nav-link">
+                <button type="button" class="logout-btn">
+                    Dashboard
+                </button>
+            </a>
+        </div>
+
+    </header>
+
+    <section class="welcome">
+        <h1>My CCTV Installations</h1>
+        <p>Register and manage your existing CCTV surveillance hardware records.</p>
+    </section>
+
+    <!-- Add / Edit CCTV Form -->
+    <div class="cctv-form">
+        <h2 id="cctvFormTitle">Register Installed CCTV System</h2>
+
+        <form id="cctvManageForm">
+            <input type="hidden" id="cctvId">
+
+            <div class="form-group">
+                <label for="cctvBrand">CCTV Brand / Manufacturer</label>
+                <input
+                    type="text"
+                    id="cctvBrand"
+                    placeholder="e.g. Godrej, CP Plus, Hikvision, Dahua"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="cctvModel">Camera Model / Series</label>
+                <input
+                    type="text"
+                    id="cctvModel"
+                    placeholder="e.g. SeeThru Smart Dome 1080P, Ace Pro 4G PT"
+                    required
+                >
+            </div>
+
+            <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+                <div class="form-group" style="flex: 1; min-width: 200px;">
+                    <label for="cctvQuantity">Number of Cameras Installed</label>
+                    <input
+                        type="number"
+                        id="cctvQuantity"
+                        placeholder="e.g. 4"
+                        min="1"
+                        required
+                    >
+                </div>
+
+                <div class="form-group" style="flex: 1; min-width: 200px;">
+                    <label for="cctvType">Camera Form Factor</label>
+                    <select id="cctvType" required>
+                        <option value="Dome">Indoor Dome Camera</option>
+                        <option value="Bullet">Outdoor Bullet Camera</option>
+                        <option value="PTZ">Pan-Tilt-Zoom (PTZ)</option>
+                        <option value="Smart Wi-Fi">Smart Wi-Fi / 4G Solar</option>
+                        <option value="VDP">Video Door Phone (VDP)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+                <div class="form-group" style="flex: 1; min-width: 200px;">
+                    <label for="installationDate">Installation Date</label>
+                    <input
+                        type="date"
+                        id="installationDate"
+                    >
+                </div>
+
+                <div class="form-group" style="flex: 1; min-width: 200px;">
+                    <label for="cctvLocation">Premises Location / Area</label>
+                    <input
+                        type="text"
+                        id="cctvLocation"
+                        placeholder="e.g. Home Entrance, Office Warehouse, Main Gate"
+                        required
+                    >
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="cctvSubmitBtn">
+                Save CCTV System
+            </button>
+
+            <button type="button" id="cancelEditButton" style="display: none;" onclick="resetCctvForm()">
+                Cancel Edit
+            </button>
+        </form>
+    </div>
+
+    <!-- Registered CCTV List -->
+    <div class="details-container">
+        <h2>Registered Systems</h2>
+        <div id="cctvListContainer">
+            <p class="no-details">Loading your CCTV records...</p>
+        </div>
+    </div>
+
+    <script src="C-JS.js"></script>
+
+    <script>
+        let customerCctvs = [];
+
+        async function loadCctvRecords() {
+            const customer = getLoggedInCustomer();
+            if (!customer || !customer._id) return;
+
+            const container = document.getElementById("cctvListContainer");
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/cctv/customer/${customer._id}`);
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || "Failed to load CCTV records.");
+                }
+
+                customerCctvs = result.cctvs || [];
+
+                if (customerCctvs.length === 0) {
+                    container.innerHTML = `
+                        <div class="details-card" style="text-align: center; padding: 32px 16px;">
+                            <div style="font-size: 40px; margin-bottom: 8px;">📹</div>
+                            <h3 style="color: #2D5A5C; margin-bottom: 6px;">No CCTV Systems Registered</h3>
+                            <p style="color: #64748B;">Use the form above to add your existing surveillance equipment.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = customerCctvs.map(c => `
+                    <div class="details-card">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <h3>${escapeHTML(c.model)} (${escapeHTML(c.brand)})</h3>
+                                <p><strong>Type:</strong> ${escapeHTML(c.type || "Dome")}</p>
+                                <p><strong>Quantity:</strong> ${c.quantity} Camera(s)</p>
+                                <p><strong>Location:</strong> ${escapeHTML(c.location || "Premises")}</p>
+                                <p><strong>Installed On:</strong> ${formatDate(c.installationDate)}</p>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button
+                                    type="button"
+                                    class="dashboard-btn"
+                                    style="padding: 6px 14px; height: 36px;"
+                                    onclick="editCctvRecord('${c._id}')"
+                                >
+                                    ✏️ Edit
+                                </button>
+                                <button
+                                    type="button"
+                                    class="remove-cart-btn"
+                                    style="padding: 6px 14px; height: 36px;"
+                                    onclick="deleteCctvRecord('${c._id}')"
+                                >
+                                    🗑️ Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join("");
+            } catch (err) {
+                console.error("CCTV record error:", err);
+                container.innerHTML = `<p class="no-details" style="color:#DC2626;">Error loading records.</p>`;
+            }
+        }
+
+        document.getElementById("cctvManageForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            const customer = getLoggedInCustomer();
+            if (!customer || !customer._id) {
+                alert("Please log in first.");
+                return;
+            }
+
+            const cctvId = document.getElementById("cctvId").value;
+            const brand = document.getElementById("cctvBrand").value.trim();
+            const model = document.getElementById("cctvModel").value.trim();
+            const quantity = Number(document.getElementById("cctvQuantity").value || 1);
+            const type = document.getElementById("cctvType").value;
+            const installationDate = document.getElementById("installationDate").value;
+            const location = document.getElementById("cctvLocation").value.trim();
+
+            const isEdit = Boolean(cctvId);
+            const url = isEdit ? `${API_BASE_URL}/cctv/${cctvId}` : `${API_BASE_URL}/cctv`;
+            const method = isEdit ? "PUT" : "POST";
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        customerId: customer._id,
+                        brand,
+                        model,
+                        quantity,
+                        type,
+                        installationDate,
+                        location
+                    })
+                });
+
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.message || "Failed to save CCTV record.");
+                }
+
+                alert(isEdit ? "CCTV system updated!" : "CCTV system registered successfully!");
+                resetCctvForm();
+                loadCctvRecords();
+            } catch (err) {
+                console.error("Save CCTV error:", err);
+                alert("Error: " + err.message);
+            }
+        });
+
+        function editCctvRecord(id) {
+            const item = customerCctvs.find(c => c._id === id);
+            if (!item) return;
+
+            document.getElementById("cctvId").value = item._id;
+            document.getElementById("cctvBrand").value = item.brand || "";
+            document.getElementById("cctvModel").value = item.model || "";
+            document.getElementById("cctvQuantity").value = item.quantity || 1;
+            document.getElementById("cctvType").value = item.type || "Dome";
+            document.getElementById("cctvLocation").value = item.location || "";
+            
+            if (item.installationDate) {
+                document.getElementById("installationDate").value = item.installationDate.substring(0, 10);
+            }
+
+            document.getElementById("cctvFormTitle").textContent = "Edit CCTV System";
+            document.getElementById("cctvSubmitBtn").textContent = "Update CCTV System";
+            document.getElementById("cancelEditButton").style.display = "block";
+            window.scrollTo({ top: 120, behavior: "smooth" });
+        }
+
+        function resetCctvForm() {
+            document.getElementById("cctvManageForm").reset();
+            document.getElementById("cctvId").value = "";
+            document.getElementById("cctvFormTitle").textContent = "Register Installed CCTV System";
+            document.getElementById("cctvSubmitBtn").textContent = "Save CCTV System";
+            document.getElementById("cancelEditButton").style.display = "none";
+        }
+
+        async function deleteCctvRecord(id) {
+            if (!confirm("Are you sure you want to delete this CCTV record?")) return;
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/cctv/${id}`, { method: "DELETE" });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || "Delete failed");
+                alert("CCTV record deleted.");
+                loadCctvRecords();
+            } catch (e) {
+                alert("Delete error: " + e.message);
+            }
+        }
+
+        loadCctvRecords();
+    </script>
+
+</body>
+
+</html>

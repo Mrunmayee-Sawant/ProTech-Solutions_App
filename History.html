@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ProTech Solutions - Payment History</title>
+
+    <link rel="stylesheet" href="C-CSS.css">
+    <link rel="icon" type="image/svg+xml" href="images/protech-logo.svg">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="dashboard-header">
+
+        <div class="brand-wrapper">
+
+            <img
+                src="images/protech-logo.svg"
+                alt="ProTech Solutions"
+                class="brand-logo-img"
+            >
+
+            <div class="company-info">
+                <h2>ProTech Solutions</h2>
+                <p>CCTV Service &amp; Sales</p>
+            </div>
+
+        </div>
+
+        <div class="header-actions">
+
+            <a href="OrderHistory.html" class="nav-link">
+                <button type="button" class="logout-btn">
+                    Product Orders
+                </button>
+            </a>
+
+            <a href="Dashboard.html" class="nav-link">
+                <button type="button" class="logout-btn">
+                    Dashboard
+                </button>
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <section class="welcome">
+
+        <h1>Payment History</h1>
+
+        <p>
+            View your complete CCTV payment transaction history.
+        </p>
+
+    </section>
+
+
+    <!-- Payment History Container -->
+    <div class="history-container">
+
+        <div id="paymentHistorySection">
+
+            <h2>Payment Transactions</h2>
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Transaction ID</th>
+                            <th>Amount</th>
+                            <th>Payment Method</th>
+                            <th>Remarks</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="paymentHistoryBody">
+
+                        <tr>
+                            <td colspan="6" style="text-align: center;">
+                                Loading payment history...
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script src="C-JS.js"></script>
+
+
+    <script>
+
+        async function loadHistory() {
+
+            const customer = getLoggedInCustomer();
+
+            if (!customer || !customer._id) {
+
+                return;
+
+            }
+
+
+            try {
+
+                const res =
+                    await fetch(
+                        `${API_BASE_URL}/payments/customer/${customer._id}`
+                    );
+
+
+                const data =
+                    await res.json();
+
+
+                const tbody =
+                    document.getElementById(
+                        "paymentHistoryBody"
+                    );
+
+
+                if (
+                    !res.ok ||
+                    !data.payments ||
+                    data.payments.length === 0
+                ) {
+
+                    tbody.innerHTML = `
+                        <tr>
+                            <td
+                                colspan="6"
+                                style="
+                                    text-align:center;
+                                    padding:24px;
+                                    color:#64748B;
+                                "
+                            >
+                                No payment transactions recorded.
+                            </td>
+                        </tr>
+                    `;
+
+                    return;
+
+                }
+
+
+                tbody.innerHTML =
+                    data.payments.map(pay => {
+
+                        const date =
+                            formatDate(
+                                pay.paymentDate ||
+                                pay.createdAt
+                            );
+
+
+                        const status =
+                            (
+                                pay.status ||
+                                "Paid"
+                            ).toLowerCase();
+
+
+                        const isSuccess =
+                            status === "paid" ||
+                            status === "completed" ||
+                            status === "success";
+
+
+                        let paymentMethod =
+                            "Offline Payment";
+
+
+                        if (
+                            pay.method === "Cash"
+                        ) {
+
+                            paymentMethod =
+                                "Cash Payment";
+
+                        }
+
+                        else if (
+                            pay.method === "UPI"
+                        ) {
+
+                            paymentMethod =
+                                "UPI";
+
+                        }
+
+                        else if (
+                            pay.method === "Card"
+                        ) {
+
+                            paymentMethod =
+                                "Card";
+
+                        }
+
+                        else if (
+                            pay.method === "NetBanking"
+                        ) {
+
+                            paymentMethod =
+                                "Net Banking";
+
+                        }
+
+
+                        return `
+
+                            <tr>
+
+                                <td>
+                                    ${date}
+                                </td>
+
+                                <td>
+                                    <code>
+                                        ${escapeHTML(
+                                            pay.transactionId ||
+                                            pay._id
+                                        )}
+                                    </code>
+                                </td>
+
+                                <td
+                                    style="
+                                        font-weight:700;
+                                        color:#2D5A5C;
+                                    "
+                                >
+                                    ₹${Number(
+                                        pay.amount || 0
+                                    ).toLocaleString("en-IN")}
+                                </td>
+
+                                <td>
+                                    ${escapeHTML(
+                                        paymentMethod
+                                    )}
+                                </td>
+
+                                <td>
+                                    ${escapeHTML(
+                                        pay.remarks ||
+                                        "Payment settled"
+                                    )}
+                                </td>
+
+                                <td>
+
+                                    <span
+                                        class="${
+                                            isSuccess
+                                                ? "paid-status"
+                                                : "pending-status"
+                                        }"
+                                    >
+                                        ● ${
+                                            escapeHTML(
+                                                pay.status ||
+                                                "Paid"
+                                            )
+                                        }
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+                        `;
+
+                    }).join("");
+
+            }
+
+            catch (err) {
+
+                console.error(
+                    "Payment history error:",
+                    err
+                );
+
+            }
+
+        }
+
+
+        loadHistory();
+
+    </script>
+
+</body>
+
+</html>
